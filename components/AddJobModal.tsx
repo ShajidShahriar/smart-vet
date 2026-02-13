@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronDown, Check, Briefcase } from "lucide-react";
 
 interface JobData {
-    id?: number;
+    id?: string;
     title: string;
     department: string;
     description: string;

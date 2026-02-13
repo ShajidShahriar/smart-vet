@@ -4,18 +4,17 @@ import { motion } from "framer-motion";
 import { Plus, Eye, Pencil } from "lucide-react";
 import AddJobModal from "./AddJobModal";
 
-// static data, gets swapped for api calls later
-export const DUMMY_JOBS = [
-    { id: 1, title: "Senior React Developer", status: "Active" as const, candidates: 12, shortlisted: 3 },
-    { id: 2, title: "UX Designer", status: "Active" as const, candidates: 8, shortlisted: 2 },
-    { id: 3, title: "Backend Engineer (Node.js)", status: "Active" as const, candidates: 19, shortlisted: 5 },
-    { id: 4, title: "Marketing Manager", status: "Closed" as const, candidates: 24, shortlisted: 6 },
-    { id: 5, title: "DevOps Engineer", status: "Active" as const, candidates: 7, shortlisted: 1 },
-    { id: 6, title: "Product Designer", status: "Closed" as const, candidates: 15, shortlisted: 4 },
-];
-
-export type Job = typeof DUMMY_JOBS[number];
-
+// shape that comes back from GET /api/jobs
+export interface Job {
+    _id: string;
+    title: string;
+    department: string;
+    description: string;
+    status: "Active" | "Closed";
+    skills: string[];
+    candidates: number;
+    shortlisted: number;
+}
 
 const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -26,20 +25,40 @@ const cardVariants = {
     }),
 };
 
-
 interface JobsDashboardProps {
-    onView?: (jobId: number) => void;
+    jobs: Job[];
+    onView?: (jobId: string) => void;
     onEdit?: (job: Job) => void;
+    onRefresh?: () => void;
 }
 
-export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
+export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsDashboardProps) {
     const [showModal, setShowModal] = useState(false);
-    const [jobStatuses, setJobStatuses] = useState<Record<number, boolean>>(() =>
-        Object.fromEntries(DUMMY_JOBS.map((j) => [j.id, j.status === "Active"]))
+    const [jobStatuses, setJobStatuses] = useState<Record<string, boolean>>(() =>
+        Object.fromEntries(jobs.map((j) => [j._id, j.status === "Active"]))
     );
 
-    const toggleStatus = (id: number) => {
+    // keep local toggle state in sync when jobs prop changes
+    React.useEffect(() => {
+        setJobStatuses(Object.fromEntries(jobs.map((j) => [j._id, j.status === "Active"])));
+    }, [jobs]);
+
+    const toggleStatus = async (id: string) => {
+        const currentlyActive = jobStatuses[id];
+        // optimistic update
         setJobStatuses((prev) => ({ ...prev, [id]: !prev[id] }));
+
+        try {
+            await fetch(`/api/jobs/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: currentlyActive ? "Closed" : "Active" }),
+            });
+            onRefresh?.();
+        } catch {
+            // revert on failure
+            setJobStatuses((prev) => ({ ...prev, [id]: currentlyActive }));
+        }
     };
 
     // press 'c' anywhere to create a new job
@@ -53,21 +72,35 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
             ) {
                 return;
             }
-            if (e.key.toLowerCase() === "c") {
-                e.preventDefault();
-                setShowModal(true);
-            }
+            if (e.key === "c" || e.key === "C") setShowModal(true);
         };
-
         window.addEventListener("keydown", handleKeyDown);
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, []);
 
+    const handleSave = async (jobData: { title: string; department: string; description: string }) => {
+        try {
+            await fetch("/api/jobs", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(jobData),
+            });
+            onRefresh?.();
+        } catch (error) {
+            console.error("failed to create job:", error);
+        }
+    };
+
     return (
         <>
-
             <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[var(--text-primary)]">Active Job Openings</h2>
+                <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Active Jobs</h2>
+                <button
+                    onClick={() => setShowModal(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+                >
+                    <Plus className="w-4 h-4" /> Post New Job
+                </button>
             </div>
 
 
@@ -77,21 +110,14 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                     <motion.button
                         layoutId="create-job-card"
                         onClick={() => setShowModal(true)}
-                        className="group relative flex flex-col items-center justify-center w-full h-full min-h-[180px] rounded-lg border-2 border-dashed border-gray-300 bg-gray-50/50 hover:border-emerald-500/50 hover:bg-emerald-50/30 transition-colors duration-300 hover:scale-[1.02] hover:-translate-y-1 cursor-pointer outline-none focus:ring-2 focus:ring-emerald-500/20"
+                        className="group w-full min-h-[180px] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 bg-transparent hover:bg-emerald-50/60 hover:border-emerald-300 transition-all duration-300 cursor-pointer relative"
                     >
-                        <motion.div
-                            initial={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="flex flex-col items-center"
-                        >
-                            <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-300">
-                                <Plus className="w-6 h-6 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
-                            </div>
-                            <span className="text-sm font-semibold text-gray-500 group-hover:text-emerald-600 transition-colors duration-300">
-                                Create New Opening
-                            </span>
-                        </motion.div>
-                        {/* keyboard shortcut hint */}
+                        <div className="w-10 h-10 rounded-xl bg-gray-100 group-hover:bg-emerald-100 flex items-center justify-center transition-colors duration-300">
+                            <Plus className="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors duration-300" />
+                        </div>
+                        <span className="text-xs font-semibold text-gray-400 group-hover:text-emerald-600 transition-colors duration-300">
+                            Create New Role
+                        </span>
                         <span className="absolute bottom-4 right-4 text-[10px] font-mono font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 group-hover:border-emerald-200 group-hover:text-emerald-600 group-hover:bg-white transition-colors duration-300">
                             C
                         </span>
@@ -100,11 +126,11 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                     <div className="w-full h-full min-h-[180px] rounded-lg border border-transparent" />
                 )}
 
-                {DUMMY_JOBS.map((job, i) => {
-                    const isActive = jobStatuses[job.id];
+                {jobs.map((job, i) => {
+                    const isActive = jobStatuses[job._id];
                     return (
                         <motion.div
-                            key={job.id}
+                            key={job._id}
                             layout
                             custom={i}
                             variants={cardVariants}
@@ -127,7 +153,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                                             {isActive ? "Accepting" : "Paused"}
                                         </span>
                                         <button
-                                            onClick={() => toggleStatus(job.id)}
+                                            onClick={() => toggleStatus(job._id)}
                                             className={`relative w-11 h-6 rounded-full transition-all duration-300 cursor-pointer ${isActive ? "bg-emerald-500" : "bg-slate-200"
                                                 }`}
                                             aria-label={`Toggle ${job.title} status`}
@@ -151,7 +177,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
 
                             <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-2">
                                 <button
-                                    onClick={() => onView?.(job.id)}
+                                    onClick={() => onView?.(job._id)}
                                     className="flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] hover:underline"
                                 >
                                     <Eye className="w-3.5 h-3.5" />
@@ -171,7 +197,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
             </div>
 
 
-            <AddJobModal isOpen={showModal} onClose={() => setShowModal(false)} layoutId="create-job-card" />
+            <AddJobModal isOpen={showModal} onClose={() => setShowModal(false)} layoutId="create-job-card" onSave={handleSave} />
         </>
     );
 }

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Upload,
@@ -32,7 +32,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 import pdfToText from "react-pdftotext";
-import JobsDashboard, { Job, DUMMY_JOBS } from "./JobsDashboard";
+import JobsDashboard, { Job } from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
 import SettingsView from "./SettingsView";
@@ -186,7 +186,7 @@ function TableHeader() {
 
 export default function Dashboard() {
     const [file, setFile] = useState<File | null>(null);
-    const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
+    const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [showAddJobModal, setShowAddJobModal] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -196,6 +196,19 @@ export default function Dashboard() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [selectedJobRole, setSelectedJobRole] = useState("");
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
+    const [jobs, setJobs] = useState<Job[]>([]);
+
+    const fetchJobs = useCallback(async () => {
+        try {
+            const res = await fetch("/api/jobs");
+            if (res.ok) setJobs(await res.json());
+        } catch (err) {
+            console.error("failed to fetch jobs:", err);
+        }
+    }, []);
+
+    // load jobs on mount
+    useEffect(() => { fetchJobs(); }, [fetchJobs]);
 
     const showToast = useCallback((message: string) => {
         setToast({ message, visible: true });
@@ -455,6 +468,7 @@ export default function Dashboard() {
                                 transition={{ duration: 0.3, ease: "easeOut" }}
                             >
                                 <JobsDashboard
+                                    jobs={jobs}
                                     onView={(jobId) => {
                                         setSelectedJobId(jobId);
                                         setActiveView("JobDetail");
@@ -463,6 +477,7 @@ export default function Dashboard() {
                                         setEditingJob(job);
                                         setShowAddJobModal(true);
                                     }}
+                                    onRefresh={fetchJobs}
                                 />
                             </motion.div>
                         ) : activeView === "JobDetail" ? (
@@ -480,16 +495,12 @@ export default function Dashboard() {
                                         setSelectedJobId(null);
                                     }}
                                     onEdit={() => {
-                                        // using mock data for now, backend will handle this
-                                        const mockJob: Job = {
-                                            id: selectedJobId || 1,
-                                            title: "Senior React Developer",
-                                            status: "Active",
-                                            candidates: 42,
-                                            shortlisted: 8
-                                        };
-                                        setEditingJob(mockJob);
-                                        setShowAddJobModal(true);
+                                        // find the job from our fetched list
+                                        const job = jobs.find(j => j._id === selectedJobId);
+                                        if (job) {
+                                            setEditingJob(job);
+                                            setShowAddJobModal(true);
+                                        }
                                     }}
                                 />
                             </motion.div>
@@ -544,8 +555,8 @@ export default function Dashboard() {
                                                     } focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20`}
                                             >
                                                 <option value="" disabled>Select a Job Role...</option>
-                                                {DUMMY_JOBS.filter(j => j.status === "Active").map((job) => (
-                                                    <option key={job.id} value={job.title}>{job.title}</option>
+                                                {jobs.filter(j => j.status === "Active").map((job) => (
+                                                    <option key={job._id} value={job.title}>{job.title}</option>
                                                 ))}
                                             </select>
                                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -736,13 +747,34 @@ export default function Dashboard() {
                             setEditingJob(null);
                         }}
                         initialData={editingJob ? {
-                            id: editingJob.id,
+                            id: editingJob._id,
                             title: editingJob.title,
-                            department: "Engineering", // placeholder until jobs api exists
-                            description: ""
+                            department: editingJob.department,
+                            description: editingJob.description
                         } : undefined}
-                        onSave={(jobData) => {
-                            console.log("Saved job:", jobData);
+                        onSave={async (jobData) => {
+                            try {
+                                if (jobData.id) {
+                                    await fetch(`/api/jobs/${jobData.id}`, {
+                                        method: "PATCH",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({
+                                            title: jobData.title,
+                                            department: jobData.department,
+                                            description: jobData.description,
+                                        }),
+                                    });
+                                } else {
+                                    await fetch("/api/jobs", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify(jobData),
+                                    });
+                                }
+                                fetchJobs();
+                            } catch (err) {
+                                console.error("save failed:", err);
+                            }
                             setShowAddJobModal(false);
                             setEditingJob(null);
                         }}
