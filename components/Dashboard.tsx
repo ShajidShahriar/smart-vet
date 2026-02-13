@@ -17,6 +17,7 @@ import {
     Settings,
     Moon,
     BarChart3,
+    Trash2,
     Mail,
     Calendar,
     ListTodo,
@@ -36,6 +37,19 @@ import JobsDashboard, { Job } from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
 import SettingsView from "./SettingsView";
+import ScanResultModal from "./ScanResultModal";
+
+export interface Scan {
+    _id: string;
+    jobId: string;
+    filename: string;
+    candidateName: string;
+    score: number;
+    status: "Pending" | "Accepted" | "Rejected" | "Pass" | "Fail";
+    summary: string;
+    category: string;
+    createdAt: string;
+}
 
 // static data. all of this gets replaced once the api exists
 const DUMMY_USER = {
@@ -197,6 +211,9 @@ export default function Dashboard() {
     const [selectedJobRole, setSelectedJobRole] = useState("");
     const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: "", visible: false });
     const [jobs, setJobs] = useState<Job[]>([]);
+    const [scans, setScans] = useState<Scan[]>([]);
+    const [showScanModal, setShowScanModal] = useState(false);
+    const [selectedScan, setSelectedScan] = useState<Scan | null>(null);
 
     const fetchJobs = useCallback(async () => {
         try {
@@ -207,8 +224,20 @@ export default function Dashboard() {
         }
     }, []);
 
-    // load jobs on mount
-    useEffect(() => { fetchJobs(); }, [fetchJobs]);
+    const fetchScans = useCallback(async () => {
+        try {
+            const res = await fetch("/api/scans");
+            if (res.ok) setScans(await res.json());
+        } catch (err) {
+            console.error("failed to fetch scans:", err);
+        }
+    }, []);
+
+    // load data on mount
+    useEffect(() => {
+        fetchJobs();
+        fetchScans();
+    }, [fetchJobs, fetchScans]);
 
     const showToast = useCallback((message: string) => {
         setToast({ message, visible: true });
@@ -260,21 +289,25 @@ export default function Dashboard() {
         setUploading(true);
         try {
             const text = await pdfToText(file);
+
+            // use FormData to send file + text
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("text", text);
+            formData.append("jobTitle", selectedJobRole);
+
             const response = await fetch("/api/analyze", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    filename: file.name,
-                    text,
-                    jobTitle: selectedJobRole // pass the job role for context
-                }),
+                body: formData, // fetch automatically sets Content-Type to multipart/form-data
             });
 
             const result = await response.json();
 
             if (result.success) {
-                // show score in alert for now
-                alert(`Analysis Complete!\n\nScore: ${result.scan.score}/100\nStatus: ${result.scan.status}\n\nSummary: ${result.scan.summary}`);
+                setSelectedScan(result.scan);
+                setShowScanModal(true);
+                fetchScans(); // refresh the list to show the new scan
+                setFile(null); // clear file input
             } else {
                 alert("Error: " + result.error);
             }
@@ -283,6 +316,53 @@ export default function Dashboard() {
             console.error(error);
         } finally {
             setUploading(false);
+        }
+    };
+
+    const handleStatusUpdate = async (id: string, newStatus: "Pass" | "Fail" | "Accepted" | "Rejected") => {
+        try {
+            await fetch(`/api/scans/${id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            await fetchScans(); // refresh list
+
+            // update local modal state too so it reflects immediately if we keep it open
+            if (selectedScan && selectedScan._id === id) {
+                // @ts-ignore
+                setSelectedScan({ ...selectedScan, status: newStatus });
+            }
+            setShowScanModal(false); // close on action per plan
+        } catch (err) {
+            console.error("failed to update status:", err);
+            showToast("Failed to update status");
+        }
+    };
+
+    const handleDeleteScan = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation(); // prevent opening the modal
+        if (!confirm("Are you sure you want to delete this scan? This action cannot be undone.")) return;
+
+        try {
+            const res = await fetch(`/api/scans/${id}`, {
+                method: "DELETE",
+            });
+
+            if (res.ok) {
+                showToast("Scan deleted successfully");
+                fetchScans(); // refresh list
+                // if the deleted scan was selected/open, close it (though modal shouldn't be open if we clicked delete on list)
+                if (selectedScan && selectedScan._id === id) {
+                    setShowScanModal(false);
+                    setSelectedScan(null);
+                }
+            } else {
+                showToast("Failed to delete scan");
+            }
+        } catch (err) {
+            console.error("failed to delete scan:", err);
+            showToast("Error deleting scan");
         }
     };
 
@@ -657,8 +737,48 @@ export default function Dashboard() {
                                                 <table className="w-full text-left">
                                                     <TableHeader />
                                                     <tbody>
-                                                        {DUMMY_RECENTS.slice(0, 5).map((item) => (
-                                                            <ScanRow key={item.id} item={item} />
+                                                        {scans.slice(0, 5).map((item) => (
+                                                            <tr
+                                                                key={item._id}
+                                                                onClick={() => { setSelectedScan(item); setShowScanModal(true); }}
+                                                                className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer"
+                                                            >
+                                                                <td className="py-4 pr-4">
+                                                                    <div className="flex items-center gap-3">
+                                                                        <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center">
+                                                                            <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-sm font-medium text-[var(--text-primary)]">{item.candidateName || "Unknown"}</p>
+                                                                            <p className="text-xs text-[var(--text-secondary)]">{item.filename}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-4 pr-4">
+                                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)]">
+                                                                        {item.category || "General"}
+                                                                    </span>
+                                                                </td>
+                                                                <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">
+                                                                    {new Date(item.createdAt).toLocaleDateString()}
+                                                                </td>
+                                                                <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}%</td>
+                                                                <td className="py-4">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-emerald-500" : item.status === "Pending" ? "bg-amber-400" : "bg-red-500"}`} />
+                                                                        <span className="text-sm font-medium text-[var(--text-primary)]">{item.status}</span>
+                                                                    </div>
+                                                                </td>
+                                                                <td className="py-4 pr-4 text-right">
+                                                                    <button
+                                                                        onClick={(e) => handleDeleteScan(e, item._id)}
+                                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                                                        title="Delete Scan"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
                                                         ))}
                                                     </tbody>
                                                 </table>
@@ -703,29 +823,49 @@ export default function Dashboard() {
                                         <table className="w-full text-left">
                                             <TableHeader />
                                             <tbody>
-                                                {DUMMY_RECENTS.map((item, idx) => (
+                                                {scans.map((item, idx) => (
                                                     <motion.tr
-                                                        key={item.id}
+                                                        key={item._id}
+                                                        onClick={() => { setSelectedScan(item); setShowScanModal(true); }}
                                                         initial={{ opacity: 0, x: -10 }}
                                                         animate={{ opacity: 1, x: 0 }}
                                                         transition={{ delay: 0.1 + (idx * 0.02) }}
-                                                        className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors"
+                                                        className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors cursor-pointer"
                                                     >
                                                         <td className="py-4 pr-4">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center">
                                                                     <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
                                                                 </div>
-                                                                <span className="text-sm font-medium text-[var(--text-primary)]">{item.name}</span>
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-[var(--text-primary)]">{item.candidateName || "Unknown"}</p>
+                                                                    <p className="text-xs text-[var(--text-secondary)]">{item.filename}</p>
+                                                                </div>
                                                             </div>
                                                         </td>
-                                                        <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">{item.date}</td>
-                                                        <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}</td>
+                                                        <td className="py-4 pr-4">
+                                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)]">
+                                                                {item.category || "General"}
+                                                            </span>
+                                                        </td>
+                                                        <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">
+                                                            {new Date(item.createdAt).toLocaleDateString()}
+                                                        </td>
+                                                        <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}%</td>
                                                         <td className="py-4">
                                                             <div className="flex items-center gap-2">
-                                                                <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Pass" ? "bg-emerald-500" : "bg-red-500"}`} />
-                                                                <span className={`text-sm font-medium ${item.status === "Pass" ? "text-emerald-600" : "text-red-600"}`}>{item.status}</span>
+                                                                <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-emerald-500" : item.status === "Pending" ? "bg-amber-400" : "bg-red-500"}`} />
+                                                                <span className="text-sm font-medium text-[var(--text-primary)]">{item.status}</span>
                                                             </div>
+                                                        </td>
+                                                        <td className="py-4 pr-4 text-right">
+                                                            <button
+                                                                onClick={(e) => handleDeleteScan(e, item._id)}
+                                                                className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+                                                                title="Delete Scan"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
                                                         </td>
                                                     </motion.tr>
                                                 ))}
@@ -795,6 +935,13 @@ export default function Dashboard() {
                     />
                 )}
             </AnimatePresence>
+
+            <ScanResultModal
+                isOpen={showScanModal}
+                onClose={() => setShowScanModal(false)}
+                scan={selectedScan}
+                onUpdateStatus={handleStatusUpdate}
+            />
 
             {/* shows up when someone tries uploading without picking a role first */}
             <AnimatePresence>

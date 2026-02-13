@@ -18,7 +18,7 @@ export async function analyzeResume(
     resumeText: string,
     jobDescription: string,
     jobTitle: string,
-    model: string = "gemini-2.0-flash",
+    model: string = "gemini-2.5-flash",
     strictness: number = 2,
 ): Promise<AnalysisResult> {
     const genAI = new GoogleGenerativeAI(getApiKey());
