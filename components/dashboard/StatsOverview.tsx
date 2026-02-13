@@ -37,7 +37,7 @@ function StatCard({
             <div className={`${color} w-[72px] flex items-center justify-center shrink-0`}>
                 <Icon className="w-6 h-6 text-white" />
             </div>
-            <div className="flex-1 bg-white px-5 py-4">
+            <div className="flex-1 bg-[var(--card-bg)] px-5 py-4">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-1">{label}</p>
                 <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
             </div>

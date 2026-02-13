@@ -39,7 +39,7 @@ export default function AllScansView({ scans, onBack, onSelectScan, onDeleteScan
             animate={{ opacity: 1, zIndex: 10 }}
             exit={{ opacity: 0, zIndex: 10, transition: { duration: 0.2 } }}
             transition={{ type: "spring", stiffness: 250, damping: 30 }}
-            className="bg-white rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
+            className="bg-[var(--card-bg)] rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
         >
             <motion.div
                 className="p-6 flex-1 flex flex-col"

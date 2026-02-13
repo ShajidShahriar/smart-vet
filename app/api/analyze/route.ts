@@ -37,10 +37,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "job not found" }, { status: 404 });
     }
 
+    // retrieving configuration from headers (BYOK support)
+    // retrieving configuration from headers (BYOK support)
+    const apiKey = req.headers.get("x-gemini-api-key") || undefined;
+    const strictness = parseInt(req.headers.get("x-gemini-strictness") || "50");
+
     const result = await analyzeResume(
       text,
       (job as Record<string, unknown>).description as string || "",
       jobTitle,
+      strictness,
+      apiKey
     );
 
     // persist the scan result

@@ -42,7 +42,7 @@ export default function ScanningOverlay({ isAnalyzing }: ScanningOverlayProps) {
                     className="fixed inset-0 z-50 pointer-events-auto cursor-wait"
                 >
                     {/* 1. Interaction Blocker Backdrop */}
-                    <div className="absolute inset-0 bg-white/50 backdrop-blur-[2px]" />
+                    <div className="absolute inset-0 bg-[var(--overlay-bg)] backdrop-blur-[2px]" />
 
                     {/* 2. Ambient Border Effect */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">

@@ -35,7 +35,7 @@ export default function RecentScans({ scans, onViewAll, onSelectScan, onDeleteSc
         // layoutId="scans-card" powers the expand transition
         <motion.div
             layoutId="scans-card"
-            className="xl:col-span-3 bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
+            className="xl:col-span-3 bg-[var(--card-bg)] rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
         >
             <motion.div
                 className="p-6 flex-1 flex flex-col"

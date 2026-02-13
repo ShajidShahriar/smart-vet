@@ -143,8 +143,16 @@ export default function Dashboard() {
             formData.append("text", text);
             formData.append("jobTitle", selectedJobRole);
 
+            // retrieve user config (BYOK)
+            const storedConfig = localStorage.getItem("smartvet_config");
+            const config = storedConfig ? JSON.parse(storedConfig) : {};
+
             const response = await fetch("/api/analyze", {
                 method: "POST",
+                headers: {
+                    ...(config.apiKey && { "x-gemini-api-key": config.apiKey }),
+                    ...(config.strictness && { "x-gemini-strictness": config.strictness.toString() }),
+                },
                 body: formData, // fetch automatically sets Content-Type to multipart/form-data
             });
 
@@ -246,7 +254,7 @@ export default function Dashboard() {
 
             <div className="flex-1 lg:ml-60 flex flex-col">
 
-                <header className="sticky top-0 z-30 h-16 bg-white border-b border-[var(--card-border)] flex items-center justify-between px-4 sm:px-6 gap-4">
+                <header className="sticky top-0 z-30 h-16 bg-[var(--card-bg)] border-b border-[var(--card-border)] flex items-center justify-between px-4 sm:px-6 gap-4">
 
                     <div className="flex items-center gap-3">
                         <button
@@ -358,7 +366,7 @@ export default function Dashboard() {
 
                                 <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 items-stretch">
 
-                                    <div className="xl:col-span-2 bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 flex flex-col">
+                                    <div className="xl:col-span-2 bg-[var(--card-bg)] rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 flex flex-col">
                                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Upload Resume</h3>
 
                                         {/* validates that a role is picked before allowing upload */}
@@ -459,7 +467,7 @@ export default function Dashboard() {
                 </main>
 
 
-                <footer className="border-t border-[var(--card-border)] bg-white px-6 py-4">
+                <footer className="border-t border-[var(--card-border)] bg-[var(--card-bg)] px-6 py-4">
                     <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
                         <p>© 2026 <span className="font-semibold text-[var(--text-primary)]">Smart-Vet</span>. All rights reserved.</p>
                         <div className="flex items-center gap-4">

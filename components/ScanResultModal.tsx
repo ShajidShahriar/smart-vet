@@ -48,7 +48,7 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="bg-[var(--card-bg)] rounded-2xl shadow-2xl w-full max-w-md pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
 
                             {/* Header with score breakdown */}
                             <div className={`relative p-6 flex flex-col items-center justify-center border-b border-gray-100 ${bgColor}`}>
@@ -120,7 +120,7 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                             <div className="p-4 bg-gray-50 border-t border-gray-100 grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => onUpdateStatus(scan._id, "Rejected")}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 transition-all shadow-sm"
+                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm bg-[var(--card-bg)] border border-rose-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 transition-all shadow-sm"
                                 >
                                     <XCircle className="w-4 h-4" />
                                     Reject

@@ -85,7 +85,7 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                 <div className="flex items-center gap-4">
                     <button
                         onClick={onBack}
-                        className="p-2 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-[var(--card-border)] hover:shadow-sm"
+                        className="p-2 hover:bg-[var(--card-bg)] rounded-lg transition-colors border border-transparent hover:border-[var(--card-border)] hover:shadow-sm"
                     >
                         <ArrowLeft className="text-[var(--text-secondary)]" size={20} />
                     </button>
@@ -199,7 +199,7 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                     <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-sm overflow-hidden">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="bg-gray-50/50 border-b border-[var(--card-border)] text-xs uppercase text-[var(--text-secondary)] font-semibold tracking-wider">
+                                <tr className="bg-[var(--body-bg)]/50 border-b border-[var(--card-border)] text-xs uppercase text-[var(--text-secondary)] font-semibold tracking-wider">
                                     <th className="px-6 py-4">Candidate</th>
                                     <th className="px-6 py-4">Match Score</th>
                                     <th className="px-6 py-4">Status</th>
@@ -287,7 +287,7 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                                 <div className="flex flex-wrap gap-2">
                                     {job.skills && job.skills.length > 0 ? (
                                         job.skills.map((skill, i) => (
-                                            <span key={i} className="px-2.5 py-1.5 bg-gray-50 text-[var(--text-secondary)] rounded-lg text-xs font-medium border border-[var(--card-border)]">
+                                            <span key={i} className="px-2.5 py-1.5 bg-[var(--body-bg)] text-[var(--text-secondary)] rounded-lg text-xs font-medium border border-[var(--card-border)]">
                                                 {skill}
                                             </span>
                                         ))

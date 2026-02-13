@@ -1,9 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// reads api key from env for now. phase 5 will pull from user settings in db
-const getApiKey = () => {
-    const key = process.env.GEMINI_API_KEY;
-    if (!key) throw new Error("GEMINI_API_KEY missing from .env.local");
+// reads api key from env or user input
+const getApiKey = (userKey?: string) => {
+    // prefer user key if provided, otherwise fallback to env
+    const key = userKey || process.env.GEMINI_API_KEY;
+    if (!key) throw new Error("GEMINI_API_KEY missing");
     return key;
 };
 
@@ -18,13 +19,24 @@ export async function analyzeResume(
     resumeText: string,
     jobDescription: string,
     jobTitle: string,
-    model: string = "gemini-2.5-flash",
-    strictness: number = 2,
+    strictness: number = 50,
+    apiKey?: string
 ): Promise<AnalysisResult> {
-    const genAI = new GoogleGenerativeAI(getApiKey());
-    const genModel = genAI.getGenerativeModel({ model });
+    const genAI = new GoogleGenerativeAI(getApiKey(apiKey));
 
-    const strictnessLabel = ["lenient", "balanced", "strict", "ruthless"][strictness - 1] || "balanced";
+    // map strictness (0-100) to temperature (0.5-0.0)
+    // strict = low temp (deterministic), lenient = higher temp (creative)
+    const temperature = Math.max(0, 0.5 - (strictness / 200));
+
+    const genModel = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        generationConfig: {
+            temperature,
+        }
+    });
+
+    // map 0-100 slider to labels
+    const strictnessLabel = strictness <= 25 ? "lenient" : strictness <= 50 ? "balanced" : strictness <= 75 ? "strict" : "ruthless";
 
     const prompt = `You are an expert hiring manager AI. Analyze this resume against the job posting below.
 

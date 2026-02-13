@@ -108,7 +108,7 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
                         <span className="text-xs font-semibold text-gray-400 group-hover:text-emerald-600 transition-colors duration-300">
                             Create New Role
                         </span>
-                        <span className="absolute bottom-4 right-4 text-[10px] font-mono font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 group-hover:border-emerald-200 group-hover:text-emerald-600 group-hover:bg-white transition-colors duration-300">
+                        <span className="absolute bottom-4 right-4 text-[10px] font-mono font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 group-hover:border-emerald-200 group-hover:text-emerald-600 group-hover:bg-[var(--card-bg)] transition-colors duration-300">
                             C
                         </span>
                     </motion.button>
@@ -126,7 +126,7 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
                             variants={cardVariants}
                             initial="hidden"
                             animate="visible"
-                            className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full min-h-[180px] ${!isActive ? "opacity-60" : ""
+                            className={`bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col h-full min-h-[180px] ${!isActive ? "opacity-60" : ""
                                 }`}
                         >
                             <div className="p-5 flex-1 flex flex-col">
@@ -159,13 +159,13 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
 
                                 <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] mt-auto">
                                     <span className="font-medium">{job.candidates} Candidates</span>
-                                    <span className="w-px h-3.5 bg-gray-200" />
+                                    <span className="w-px h-3.5 bg-[var(--card-border)]" />
                                     <span className="font-medium">{job.shortlisted} Shortlisted</span>
                                 </div>
                             </div>
 
 
-                            <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-2">
+                            <div className="px-5 py-3 border-t border-[var(--card-border)] bg-[var(--body-bg)]/50 flex items-center gap-2">
                                 <button
                                     onClick={() => onView?.(job._id)}
                                     className="flex items-center gap-1.5 text-xs font-semibold text-[var(--accent)] hover:underline"

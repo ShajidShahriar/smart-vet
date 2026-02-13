@@ -3,6 +3,8 @@ import mongoose, { Schema, models, model } from "mongoose";
 const UserSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    emailVerified: { type: Date, default: null }, // NextAuth
+    image: { type: String, default: "" },         // NextAuth
     jobTitle: { type: String, default: "" },
     avatarUrl: { type: String, default: "" },
 

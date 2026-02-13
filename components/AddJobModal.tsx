@@ -92,7 +92,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                     {/* layoutId connects this to the ghost card in JobsDashboard */}
                     <motion.div
                         layoutId={layoutId}
-                        className="pointer-events-auto relative w-full max-w-lg bg-white rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
+                        className="pointer-events-auto relative w-full max-w-lg bg-[var(--card-bg)] rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     >
                         {/* content fades in after the panel expands */}
