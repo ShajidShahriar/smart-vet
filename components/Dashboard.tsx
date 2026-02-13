@@ -250,17 +250,31 @@ export default function Dashboard() {
 
     const handleUpload = async () => {
         if (!file) return;
+
+        // validate that a role is selected so we know what to grade against
+        if (!selectedJobRole) {
+            showToast("Please select a job role first!");
+            return;
+        }
+
         setUploading(true);
         try {
             const text = await pdfToText(file);
             const response = await fetch("/api/analyze", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ filename: file.name, text }),
+                body: JSON.stringify({
+                    filename: file.name,
+                    text,
+                    jobTitle: selectedJobRole // pass the job role for context
+                }),
             });
+
             const result = await response.json();
+
             if (result.success) {
-                alert("✅ Analysis complete! Check your terminal.");
+                // show score in alert for now
+                alert(`Analysis Complete!\n\nScore: ${result.scan.score}/100\nStatus: ${result.scan.status}\n\nSummary: ${result.scan.summary}`);
             } else {
                 alert("Error: " + result.error);
             }

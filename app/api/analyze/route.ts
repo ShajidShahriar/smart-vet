@@ -1,23 +1,60 @@
 import { NextResponse } from "next/server";
+import dbConnect from "@/lib/mongodb";
+import Job from "@/lib/models/Job";
+import Scan from "@/lib/models/Scan";
+import { analyzeResume } from "@/lib/gemini";
 
 export async function POST(req: Request) {
   try {
+    await dbConnect();
+    const { text, filename, jobTitle } = await req.json();
 
-    const body = await req.json();
-    const { text, filename } = body;
+    if (!text || !jobTitle) {
+      return NextResponse.json(
+        { error: "resume text and job title are both required" },
+        { status: 400 }
+      );
+    }
 
-    console.log(` SERVER: Received text for ${filename}`);
-    console.log("CONTENT PREVIEW:", text.substring(0, 100));
+    // find the job so we can use its description in the prompt
+    const job = await Job.findOne({ title: jobTitle }).lean();
+    if (!job) {
+      return NextResponse.json({ error: "job not found" }, { status: 404 });
+    }
 
-    // just echoing back for now. gemini integration goes here once settings are wired
+    const result = await analyzeResume(
+      text,
+      (job as Record<string, unknown>).description as string || "",
+      jobTitle,
+    );
+
+    // persist the scan result
+    const scan = await Scan.create({
+      jobId: (job as Record<string, unknown>)._id,
+      filename,
+      candidateName: result.candidateName,
+      score: result.score,
+      status: result.status,
+      category: jobTitle,
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Text received successfully"
+      scan: {
+        _id: scan._id,
+        filename: scan.filename,
+        candidateName: result.candidateName,
+        score: result.score,
+        status: result.status,
+        summary: result.summary,
+        category: jobTitle,
+      },
     });
-
   } catch (error) {
-    console.error("Server Error:", error);
-    return NextResponse.json({ error: "Failed to process data" }, { status: 500 });
+    console.error("POST /api/analyze failed:", error);
+    return NextResponse.json(
+      { error: "analysis failed" },
+      { status: 500 }
+    );
   }
 }
