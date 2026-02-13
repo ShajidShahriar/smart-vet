@@ -22,6 +22,12 @@ interface JobDetailViewProps {
 }
 
 export default function JobDetailView({ job, candidates, onBack, onEdit, onSelectCandidate, onDeleteCandidate }: JobDetailViewProps) {
+    const [searchQuery, setSearchQuery] = React.useState("");
+    const [statusFilter, setStatusFilter] = React.useState<string>("All");
+    const [minScore, setMinScore] = React.useState<string>("0");
+    const [sortOrder, setSortOrder] = React.useState<string>("newest");
+    const [showFilters, setShowFilters] = React.useState(false);
+
     // calculate stats from real candidates
     const stats = {
         total: candidates.length,
@@ -29,6 +35,47 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
         rejected: candidates.filter(c => c.status === "Fail" || c.status === "Rejected").length,
         pending: candidates.filter(c => c.status === "Pending").length
     };
+
+    const filteredCandidates = React.useMemo(() => {
+        let result = [...candidates];
+
+        // 1. Search
+        if (searchQuery) {
+            const lower = searchQuery.toLowerCase();
+            result = result.filter(c =>
+                (c.candidateName && c.candidateName.toLowerCase().includes(lower)) ||
+                (c.filename && c.filename.toLowerCase().includes(lower))
+            );
+        }
+
+        // 2. Status Filter
+        if (statusFilter !== "All") {
+            if (statusFilter === "Shortlisted") {
+                result = result.filter(c => c.status === "Pass" || c.status === "Accepted");
+            } else if (statusFilter === "Rejected") {
+                result = result.filter(c => c.status === "Fail" || c.status === "Rejected");
+            } else {
+                result = result.filter(c => c.status === statusFilter);
+            }
+        }
+
+        // 3. Min Score
+        const min = parseInt(minScore);
+        if (min > 0) {
+            result = result.filter(c => c.score >= min);
+        }
+
+        // 4. Sort
+        result.sort((a, b) => {
+            if (sortOrder === "newest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            if (sortOrder === "oldest") return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
+            if (sortOrder === "score_high") return b.score - a.score;
+            if (sortOrder === "score_low") return a.score - b.score;
+            return 0;
+        });
+
+        return result;
+    }, [candidates, searchQuery, statusFilter, minScore, sortOrder]);
 
     return (
         <div className="min-h-screen bg-[var(--body-bg)] p-8 font-sans text-[var(--text-primary)]">
@@ -78,19 +125,74 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                 <div className="col-span-12 xl:col-span-8 space-y-6">
 
 
-                    <div className="bg-[var(--card-bg)] p-2 rounded-lg border border-[var(--card-border)] shadow-sm flex justify-between">
-                        <div className="relative flex-1 max-w-md">
-                            <Search className="absolute left-3 top-2.5 text-[var(--text-secondary)]" size={18} />
-                            <input type="text" placeholder="Search candidates..." className="w-full pl-10 pr-4 py-2 text-sm outline-none bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]" />
+                    <div className="bg-[var(--card-bg)] p-2 rounded-lg border border-[var(--card-border)] shadow-sm flex flex-col gap-2">
+                        <div className="flex justify-between items-center">
+                            <div className="relative flex-1 max-w-md">
+                                <Search className="absolute left-3 top-2.5 text-[var(--text-secondary)]" size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="Search candidates..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="w-full pl-10 pr-4 py-2 text-sm outline-none bg-transparent text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
+                                />
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${showFilters ? 'bg-gray-100 text-[var(--text-primary)]' : 'hover:bg-gray-50 text-[var(--text-secondary)]'}`}
+                                >
+                                    <Filter size={16} /> Filters
+                                </button>
+                                <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg text-sm font-medium text-[var(--text-secondary)] transition-colors">
+                                    <Download size={16} /> Export
+                                </button>
+                            </div>
                         </div>
-                        <div className="flex gap-2">
-                            <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg text-sm font-medium text-[var(--text-secondary)] transition-colors">
-                                <Filter size={16} /> Filter
-                            </button>
-                            <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg text-sm font-medium text-[var(--text-secondary)] transition-colors">
-                                <Download size={16} /> Export
-                            </button>
-                        </div>
+
+                        {showFilters && (
+                            <div className="p-3 border-t border-[var(--card-border)] grid grid-cols-3 gap-4 animate-in slide-in-from-top-2 duration-200">
+                                <div>
+                                    <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase mb-1.5 block">Status</label>
+                                    <select
+                                        value={statusFilter}
+                                        onChange={(e) => setStatusFilter(e.target.value)}
+                                        className="w-full bg-gray-50 border border-[var(--card-border)] rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]/10"
+                                    >
+                                        <option value="All">All Statuses</option>
+                                        <option value="Shortlisted">Shortlisted (Pass/Accepted)</option>
+                                        <option value="Rejected">Rejected (Fail)</option>
+                                        <option value="Pending">Pending</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase mb-1.5 block">Score</label>
+                                    <select
+                                        value={minScore}
+                                        onChange={(e) => setMinScore(e.target.value)}
+                                        className="w-full bg-gray-50 border border-[var(--card-border)] rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]/10"
+                                    >
+                                        <option value="0">All Scores</option>
+                                        <option value="50">&gt; 50%</option>
+                                        <option value="80">&gt; 80%</option>
+                                        <option value="90">&gt; 90%</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase mb-1.5 block">Sort By</label>
+                                    <select
+                                        value={sortOrder}
+                                        onChange={(e) => setSortOrder(e.target.value)}
+                                        className="w-full bg-gray-50 border border-[var(--card-border)] rounded-md px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-[var(--accent)]/10"
+                                    >
+                                        <option value="newest">Newest First</option>
+                                        <option value="oldest">Oldest First</option>
+                                        <option value="score_high">Highest Score</option>
+                                        <option value="score_low">Lowest Score</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
 
@@ -105,14 +207,14 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-[var(--card-border)]">
-                                {candidates.length === 0 ? (
+                                {filteredCandidates.length === 0 ? (
                                     <tr>
                                         <td colSpan={4} className="px-6 py-8 text-center text-[var(--text-secondary)] italic">
-                                            No candidates found for this job yet. Upload a resume to get started.
+                                            {candidates.length === 0 ? "No candidates found for this job yet. Upload a resume to get started." : "No candidates match your filters."}
                                         </td>
                                     </tr>
                                 ) : (
-                                    candidates.map((c) => (
+                                    filteredCandidates.map((c) => (
                                         <tr
                                             key={c._id}
                                             onClick={() => onSelectCandidate(c)}
