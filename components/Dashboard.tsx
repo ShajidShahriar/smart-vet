@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useCallback, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Upload,
@@ -10,10 +11,12 @@ import {
     ScanText,
     Search,
     Moon,
+    Sun,
     Bell,
     Settings,
     type LucideIcon,
 } from "lucide-react";
+import { signOut } from "next-auth/react";
 import pdfToText from "react-pdftotext";
 import JobsDashboard from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
@@ -24,6 +27,7 @@ import StatsOverview from "./dashboard/StatsOverview";
 import RecentScans from "./dashboard/RecentScans";
 import AllScansView from "./dashboard/AllScansView";
 import SettingsView from "./dashboard/SettingsView";
+import ProfileModal from "./dashboard/ProfileModal";
 import ScanningOverlay from "./ScanningOverlay";
 import { Job, Scan } from "../types";
 
@@ -61,6 +65,13 @@ export default function Dashboard() {
     const [scans, setScans] = useState<Scan[]>([]);
     const [showScanModal, setShowScanModal] = useState(false);
     const [selectedScan, setSelectedScan] = useState<Scan | null>(null);
+    const [showProfileModal, setShowProfileModal] = useState(false);
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const fetchJobs = useCallback(async () => {
         try {
@@ -270,19 +281,30 @@ export default function Dashboard() {
 
 
                     <div className="flex items-center gap-2">
-                        <button className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors">
-                            <Moon className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
+                        >
+                            {mounted && theme === "dark" ? (
+                                <Moon className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+                            ) : (
+                                <Sun className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+                            )}
                         </button>
-                        <button className="relative w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors">
-                            <Bell className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-                        </button>
-                        <button className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors">
+                        {/* Notification bell removed per request */}
+                        <button
+                            onClick={() => setActiveView("Settings & API")}
+                            className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
+                        >
                             <Settings className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
                         </button>
-                        <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white ml-1 cursor-pointer">
+                        <motion.button
+                            layoutId="profile-modal"
+                            onClick={() => setShowProfileModal(true)}
+                            className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white ml-1 cursor-pointer overflow-hidden border border-transparent hover:border-[var(--accent)] transition-colors"
+                        >
                             {DUMMY_USER.name.charAt(0)}
-                        </div>
+                        </motion.button>
                     </div>
                 </header>
 
@@ -530,6 +552,21 @@ export default function Dashboard() {
                 scan={selectedScan}
                 onUpdateStatus={handleStatusUpdate}
             />
+
+            <AnimatePresence>
+                {showProfileModal && (
+                    <ProfileModal
+                        isOpen={showProfileModal}
+                        onClose={() => setShowProfileModal(false)}
+                        user={DUMMY_USER}
+                        onSignOut={() => signOut()}
+                        onEditProfile={() => {
+                            setShowProfileModal(false);
+                            setActiveView("Settings & API");
+                        }}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* shows up when someone tries uploading without picking a role first */}
             <AnimatePresence>

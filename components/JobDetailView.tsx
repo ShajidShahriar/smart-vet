@@ -113,9 +113,6 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                     >
                         Edit Job
                     </button>
-                    <button className="bg-[var(--text-primary)] text-white hover:bg-gray-800 px-4 py-2 rounded-lg text-sm font-semibold shadow-lg shadow-gray-900/10 transition-all">
-                        Upload Resumes
-                    </button>
                 </div>
             </div>
 
@@ -143,9 +140,6 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${showFilters ? 'bg-gray-100 text-[var(--text-primary)]' : 'hover:bg-gray-50 text-[var(--text-secondary)]'}`}
                                 >
                                     <Filter size={16} /> Filters
-                                </button>
-                                <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-lg text-sm font-medium text-[var(--text-secondary)] transition-colors">
-                                    <Download size={16} /> Export
                                 </button>
                             </div>
                         </div>
@@ -331,6 +325,6 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                 </div>
 
             </div>
-        </div>
+        </div >
     );
 }

@@ -17,10 +17,8 @@ export default function SignInView() {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 className="relative w-full max-w-md bg-[var(--card-bg)] rounded-2xl border border-[var(--card-border)] shadow-xl p-8 md:p-10 text-center"
             >
-                <div className="w-16 h-16 bg-[var(--accent-light)] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
-                    <svg className="w-8 h-8 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div className="flex justify-center mb-8">
+                    <img src="/smart-vet-logo.svg" alt="Smart-Vet" className="w-32 h-32" />
                 </div>
 
                 <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2 tracking-tight">Welcome to SmartVet</h1>

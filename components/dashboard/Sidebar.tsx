@@ -15,17 +15,16 @@ import { motion, AnimatePresence } from "framer-motion";
 type NavSection = { label: string; items: { name: string; icon: LucideIcon; active?: boolean; badge?: string }[] };
 const NAV_SECTIONS: NavSection[] = [
     {
-        label: "MENU",
+        label: "Menu", // kept for key but hidden in UI
         items: [
             { name: "Dashboard", icon: LayoutGrid, badge: "5" },
         ],
     },
     {
-        label: "CONFIGURATION",
+        label: "Configuration", // kept for key but hidden in UI
         items: [
             { name: "Active Jobs", icon: Briefcase, badge: "New" },
             { name: "Settings & API", icon: Settings },
-            { name: "Security", icon: ShieldCheck },
         ],
     },
 ];
@@ -50,17 +49,18 @@ export default function Sidebar({
     return (
         <>
             <aside className="hidden lg:flex flex-col w-60 bg-[var(--sidebar-bg)] text-white fixed inset-y-0 left-0 z-40">
-                <div className="flex items-center gap-2.5 px-6 h-16 border-b border-white/[0.06]">
-                    <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                    <span className="text-base font-bold tracking-tight">Smart-Vet</span>
+                <div
+                    onClick={() => { setActiveView("Dashboard"); setShowAllScans(false); }}
+                    className="flex items-center gap-3 px-6 h-16 border-b border-white/[0.06] cursor-pointer hover:bg-white/[0.05] transition-colors"
+                >
+                    <img src="/smart-vet-logo.svg" alt="Smart-Vet" className="w-8 h-8" />
+                    <span className="text-lg font-bold tracking-tight">Smart-Vet</span>
                 </div>
 
-                <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
+                <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-2">
                     {NAV_SECTIONS.map((section) => (
                         <div key={section.label}>
-                            <p className="text-[10px] font-semibold tracking-widest text-[var(--sidebar-text)] uppercase mb-2 px-2">
-                                {section.label}
-                            </p>
+                            {/* Section label removed per request */}
                             <ul className="space-y-1">
                                 {section.items.map((item) => (
                                     <li key={item.name}>
@@ -122,9 +122,12 @@ export default function Sidebar({
                             transition={{ type: "spring", damping: 28, stiffness: 300 }}
                         >
                             <div className="flex items-center justify-between px-6 h-16 border-b border-white/[0.06]">
-                                <div className="flex items-center gap-2.5">
-                                    <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                                    <span className="text-base font-bold tracking-tight">Smart-Vet</span>
+                                <div
+                                    onClick={() => { setActiveView("Dashboard"); setShowAllScans(false); setMobileMenuOpen(false); }}
+                                    className="flex items-center gap-3 cursor-pointer"
+                                >
+                                    <img src="/smart-vet-logo.svg" alt="Smart-Vet" className="w-8 h-8" />
+                                    <span className="text-lg font-bold tracking-tight">Smart-Vet</span>
                                 </div>
                                 <button
                                     onClick={() => setMobileMenuOpen(false)}
@@ -137,9 +140,7 @@ export default function Sidebar({
                             <nav className="px-4 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
                                 {NAV_SECTIONS.map((section) => (
                                     <div key={section.label}>
-                                        <p className="text-[10px] font-semibold tracking-widest text-[var(--sidebar-text)] uppercase mb-2 px-2">
-                                            {section.label}
-                                        </p>
+                                        {/* Section label removed */}
                                         <ul className="space-y-1">
                                             {section.items.map((item) => (
                                                 <li key={item.name}>
