@@ -4,17 +4,7 @@ import { motion } from "framer-motion";
 import { Plus, Eye, Pencil } from "lucide-react";
 import AddJobModal from "./AddJobModal";
 
-// shape that comes back from GET /api/jobs
-export interface Job {
-    _id: string;
-    title: string;
-    department: string;
-    description: string;
-    status: "Active" | "Closed";
-    skills: string[];
-    candidates: number;
-    shortlisted: number;
-}
+import { Job } from "../types";
 
 const cardVariants = {
     hidden: { opacity: 0, y: 20 },

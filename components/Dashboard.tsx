@@ -3,53 +3,29 @@ import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Upload,
-    User,
-    FileText,
     CheckCircle2,
     XCircle,
     Sparkles,
-    Clock,
-    ChevronRight,
-    ArrowLeft,
-    LayoutGrid,
+    Menu,
+    ScanText,
     Search,
+    Moon,
     Bell,
     Settings,
-    Moon,
-    BarChart3,
-    Trash2,
-    Mail,
-    Calendar,
-    ListTodo,
-    Receipt,
-    Layers,
-    PieChart,
-    Table,
-    ScanText,
-    Briefcase,
-    ShieldCheck,
-    Menu,
-    X,
     type LucideIcon,
 } from "lucide-react";
 import pdfToText from "react-pdftotext";
-import JobsDashboard, { Job } from "./JobsDashboard";
+import JobsDashboard from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
-import SettingsView from "./SettingsView";
 import ScanResultModal from "./ScanResultModal";
-
-export interface Scan {
-    _id: string;
-    jobId: string;
-    filename: string;
-    candidateName: string;
-    score: number;
-    status: "Pending" | "Accepted" | "Rejected" | "Pass" | "Fail";
-    summary: string;
-    category: string;
-    createdAt: string;
-}
+import Sidebar from "./dashboard/Sidebar";
+import StatsOverview from "./dashboard/StatsOverview";
+import RecentScans from "./dashboard/RecentScans";
+import AllScansView from "./dashboard/AllScansView";
+import SettingsView from "./dashboard/SettingsView";
+import ScanningOverlay from "./ScanningOverlay";
+import { Job, Scan } from "../types";
 
 // static data. all of this gets replaced once the api exists
 const DUMMY_USER = {
@@ -66,136 +42,7 @@ const DUMMY_STATS = {
     credits: { value: `${10 - 7}/${10}`, change: "Remaining", up: true },
 };
 
-const DUMMY_RECENTS = [
-    { id: 1, name: "John_Doe_Resume.pdf", date: "Feb 12, 2026", score: "92%", status: "Pass" as const, category: "Senior React Developer" },
-    { id: 2, name: "Jane_Smith_CV.pdf", date: "Feb 11, 2026", score: "41%", status: "Fail" as const, category: "UX Designer" },
-    { id: 3, name: "Alex_Johnson_Resume.pdf", date: "Feb 10, 2026", score: "87%", status: "Pass" as const, category: "Backend Engineer (Node.js)" },
-    { id: 4, name: "Maria_Garcia_CV.pdf", date: "Feb 09, 2026", score: "63%", status: "Pass" as const, category: "Senior React Developer" },
-    { id: 5, name: "James_Wilson_Resume.pdf", date: "Feb 08, 2026", score: "29%", status: "Fail" as const, category: "DevOps Engineer" },
-    { id: 6, name: "Emily_Chen_Resume.pdf", date: "Feb 07, 2026", score: "88%", status: "Pass" as const, category: "Backend Engineer (Node.js)" },
-    { id: 7, name: "Robert_Brown_CV.pdf", date: "Feb 06, 2026", score: "35%", status: "Fail" as const, category: "UX Designer" },
-    { id: 8, name: "Sarah_Davis_Resume.pdf", date: "Feb 05, 2026", score: "76%", status: "Pass" as const, category: "Senior React Developer" },
-    { id: 9, name: "Michael_Lee_CV.pdf", date: "Feb 04, 2026", score: "54%", status: "Pass" as const, category: "DevOps Engineer" },
-    { id: 10, name: "Olivia_Martinez_Resume.pdf", date: "Feb 03, 2026", score: "22%", status: "Fail" as const, category: "Backend Engineer (Node.js)" },
-    { id: 11, name: "Daniel_Taylor_CV.pdf", date: "Feb 02, 2026", score: "91%", status: "Pass" as const, category: "Senior React Developer" },
-    { id: 12, name: "Sophia_Anderson_Resume.pdf", date: "Feb 01, 2026", score: "68%", status: "Pass" as const, category: "UX Designer" },
-    { id: 13, name: "Chris_Thomas_CV.pdf", date: "Jan 31, 2026", score: "19%", status: "Fail" as const, category: "DevOps Engineer" },
-    { id: 14, name: "Rachel_White_Resume.pdf", date: "Jan 30, 2026", score: "83%", status: "Pass" as const, category: "Backend Engineer (Node.js)" },
-    { id: 15, name: "Kevin_Harris_CV.pdf", date: "Jan 29, 2026", score: "47%", status: "Fail" as const, category: "Senior React Developer" },
-    { id: 16, name: "Amanda_Clark_Resume.pdf", date: "Jan 28, 2026", score: "95%", status: "Pass" as const, category: "UX Designer" },
-    { id: 17, name: "Brian_Lewis_CV.pdf", date: "Jan 27, 2026", score: "31%", status: "Fail" as const, category: "DevOps Engineer" },
-    { id: 18, name: "Jessica_Robinson_Resume.pdf", date: "Jan 26, 2026", score: "72%", status: "Pass" as const, category: "Backend Engineer (Node.js)" },
-    { id: 19, name: "Nathan_Walker_CV.pdf", date: "Jan 25, 2026", score: "58%", status: "Pass" as const, category: "Senior React Developer" },
-    { id: 20, name: "Laura_Hall_Resume.pdf", date: "Jan 24, 2026", score: "26%", status: "Fail" as const, category: "UX Designer" },
-];
 
-// these names have to match activeView values exactly or routing breaks
-type NavSection = { label: string; items: { name: string; icon: LucideIcon; active?: boolean; badge?: string }[] };
-const NAV_SECTIONS: NavSection[] = [
-    {
-        label: "MENU",
-        items: [
-            { name: "Dashboard", icon: LayoutGrid, badge: "5" },
-        ],
-    },
-    {
-        label: "CONFIGURATION",
-        items: [
-            { name: "Active Jobs", icon: Briefcase, badge: "New" },
-            { name: "Settings & API", icon: Settings },
-            { name: "Security", icon: ShieldCheck },
-        ],
-    },
-];
-
-// delay per card index so they don't all pop in at once
-const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
-    visible: (i: number) => ({
-        opacity: 1,
-        y: 0,
-        transition: { delay: i * 0.06, duration: 0.35, ease: "easeOut" as const },
-    }),
-};
-
-
-function StatCard({
-    icon: Icon,
-    color,
-    label,
-    value,
-    index,
-}: {
-    icon: LucideIcon;
-    color: string;
-    label: string;
-    value: string;
-    index: number;
-}) {
-    return (
-        <motion.div
-            custom={index}
-            variants={fadeUp}
-            initial="hidden"
-            animate="visible"
-            className="flex rounded-lg overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
-        >
-
-            <div className={`${color} w-[72px] flex items-center justify-center shrink-0`}>
-                <Icon className="w-6 h-6 text-white" />
-            </div>
-
-            <div className="flex-1 bg-white px-5 py-4">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-1">{label}</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-            </div>
-        </motion.div>
-    );
-}
-
-// shared between dashboard preview and expanded view
-function ScanRow({ item }: { item: typeof DUMMY_RECENTS[number] }) {
-    return (
-        <tr className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors">
-            <td className="py-4 pr-4">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
-                    </div>
-                    <span className="text-sm font-medium text-[var(--text-primary)]">{item.name}</span>
-                </div>
-            </td>
-            <td className="py-4 pr-4">
-                <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)]">
-                    {item.category}
-                </span>
-            </td>
-            <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">{item.date}</td>
-            <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}</td>
-            <td className="py-4">
-                <div className="flex items-center gap-2">
-                    <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Pass" ? "bg-emerald-500" : "bg-red-500"}`} />
-                    <span className={`text-sm font-medium ${item.status === "Pass" ? "text-emerald-600" : "text-red-600"}`}>{item.status}</span>
-                </div>
-            </td>
-        </tr>
-    );
-}
-
-
-function TableHeader() {
-    return (
-        <thead>
-            <tr className="border-b border-gray-100">
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">File Name</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Category</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Date</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Score</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3">Status</th>
-            </tr>
-        </thead>
-    );
-}
 
 
 export default function Dashboard() {
@@ -307,6 +154,7 @@ export default function Dashboard() {
                 setSelectedScan(result.scan);
                 setShowScanModal(true);
                 fetchScans(); // refresh the list to show the new scan
+                fetchJobs(); // refresh job cards for candidate count
                 setFile(null); // clear file input
             } else {
                 alert("Error: " + result.error);
@@ -327,6 +175,7 @@ export default function Dashboard() {
                 body: JSON.stringify({ status: newStatus }),
             });
             await fetchScans(); // refresh list
+            fetchJobs(); // refresh job cards for shortlisted count
 
             // update local modal state too so it reflects immediately if we keep it open
             if (selectedScan && selectedScan._id === id) {
@@ -352,6 +201,7 @@ export default function Dashboard() {
             if (res.ok) {
                 showToast("Scan deleted successfully");
                 fetchScans(); // refresh list
+                fetchJobs(); // refresh job cards for candidate/shortlisted count
                 // if the deleted scan was selected/open, close it (though modal shouldn't be open if we clicked delete on list)
                 if (selectedScan && selectedScan._id === id) {
                     setShowScanModal(false);
@@ -366,148 +216,32 @@ export default function Dashboard() {
         }
     };
 
+    const stats = React.useMemo(() => {
+        const total = scans.length;
+        const shortlisted = scans.filter(s => s.status === "Pass" || s.status === "Accepted").length;
+        const rejected = scans.filter(s => s.status === "Fail" || s.status === "Rejected").length;
+
+        return {
+            totalScans: { value: total.toLocaleString(), change: "", up: true },
+            shortlisted: { value: shortlisted.toLocaleString(), change: "", up: true },
+            rejected: { value: rejected.toLocaleString(), change: "", up: false },
+            credits: DUMMY_STATS.credits, // keep dummy for now per request
+        };
+    }, [scans]);
+
     return (
         <div className="flex min-h-screen bg-[var(--body-bg)]">
+            <ScanningOverlay isAnalyzing={uploading} />
+            <Sidebar
+                activeView={activeView}
+                setActiveView={setActiveView}
+                setShowAllScans={setShowAllScans}
+                mobileMenuOpen={mobileMenuOpen}
+                setMobileMenuOpen={setMobileMenuOpen}
+                user={DUMMY_USER}
+            />
 
-            <aside className="hidden lg:flex flex-col w-60 bg-[var(--sidebar-bg)] text-white fixed inset-y-0 left-0 z-40">
-
-                <div className="flex items-center gap-2.5 px-6 h-16 border-b border-white/[0.06]">
-                    <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                    <span className="text-base font-bold tracking-tight">Smart-Vet</span>
-                </div>
-
-
-                <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
-                    {NAV_SECTIONS.map((section) => (
-                        <div key={section.label}>
-                            <p className="text-[10px] font-semibold tracking-widest text-[var(--sidebar-text)] uppercase mb-2 px-2">
-                                {section.label}
-                            </p>
-                            <ul className="space-y-1">
-                                {section.items.map((item) => (
-                                    <li key={item.name}>
-                                        <button
-                                            onClick={() => { setActiveView(item.name); setShowAllScans(false); }}
-                                            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
-                                                ? "bg-emerald-500 text-white font-semibold"
-                                                : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
-                                                }`}
-                                        >
-                                            <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
-                                            <span className="flex-1 text-left">{item.name}</span>
-                                            {item.badge && (
-                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
-                                                    ? "bg-white/20 text-white"
-                                                    : "bg-slate-700 text-slate-300"
-                                                    }`}>
-                                                    {item.badge}
-                                                </span>
-                                            )}
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-                </nav>
-
-
-                <div className="px-4 py-4 border-t border-white/[0.06]">
-                    <div className="flex items-center gap-3 px-2">
-                        <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
-                            {DUMMY_USER.name.charAt(0)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-xs font-semibold text-white truncate">{DUMMY_USER.name}</p>
-                            <p className="text-[10px] text-[var(--sidebar-text)] truncate">{DUMMY_USER.role}</p>
-                        </div>
-                    </div>
-                </div>
-            </aside>
-
-            {/* slides down as an overlay on mobile */}
-            <AnimatePresence>
-                {mobileMenuOpen && (
-                    <>
-
-                        <motion.div
-                            className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setMobileMenuOpen(false)}
-                        />
-
-                        <motion.div
-                            className="fixed top-0 left-0 right-0 z-50 bg-[var(--sidebar-bg)] text-white rounded-b-2xl shadow-2xl lg:hidden"
-                            initial={{ y: "-100%" }}
-                            animate={{ y: 0 }}
-                            exit={{ y: "-100%" }}
-                            transition={{ type: "spring", damping: 28, stiffness: 300 }}
-                        >
-
-                            <div className="flex items-center justify-between px-6 h-16 border-b border-white/[0.06]">
-                                <div className="flex items-center gap-2.5">
-                                    <Sparkles className="w-5 h-5 text-[var(--accent)]" />
-                                    <span className="text-base font-bold tracking-tight">Smart-Vet</span>
-                                </div>
-                                <button
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="w-9 h-9 rounded-lg hover:bg-white/10 flex items-center justify-center transition-colors"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-
-                            <nav className="px-4 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
-                                {NAV_SECTIONS.map((section) => (
-                                    <div key={section.label}>
-                                        <p className="text-[10px] font-semibold tracking-widest text-[var(--sidebar-text)] uppercase mb-2 px-2">
-                                            {section.label}
-                                        </p>
-                                        <ul className="space-y-1">
-                                            {section.items.map((item) => (
-                                                <li key={item.name}>
-                                                    <button
-                                                        onClick={() => { setActiveView(item.name); setShowAllScans(false); setMobileMenuOpen(false); }}
-                                                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
-                                                            ? "bg-emerald-500 text-white font-semibold"
-                                                            : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
-                                                            }`}
-                                                    >
-                                                        <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
-                                                        <span className="flex-1 text-left">{item.name}</span>
-                                                        {item.badge && (
-                                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
-                                                                ? "bg-white/20 text-white"
-                                                                : "bg-slate-700 text-slate-300"
-                                                                }`}>
-                                                                {item.badge}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
-                            </nav>
-
-                            <div className="px-6 py-4 border-t border-white/[0.06]">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
-                                        {DUMMY_USER.name.charAt(0)}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-semibold text-white truncate">{DUMMY_USER.name}</p>
-                                        <p className="text-[10px] text-[var(--sidebar-text)] truncate">{DUMMY_USER.role}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+            {/* main content */}
 
 
             <div className="flex-1 lg:ml-60 flex flex-col">
@@ -521,13 +255,8 @@ export default function Dashboard() {
                         >
                             <Menu className="w-5 h-5 text-[var(--text-secondary)]" />
                         </button>
-                        <div className="flex items-center gap-2 bg-[var(--body-bg)] rounded-xl px-4 py-2.5 w-full max-w-xs">
-                            <Search className="w-4 h-4 text-[var(--text-secondary)]" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="bg-transparent text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none w-full"
-                            />
+                        <div className="flex items-center gap-2 px-4 py-2.5">
+                            <span className="text-xl font-bold text-[var(--text-primary)]">Dashboard</span>
                         </div>
                     </div>
 
@@ -584,18 +313,21 @@ export default function Dashboard() {
                                 transition={{ duration: 0.3, ease: "easeOut" }}
                             >
                                 <JobDetailView
+                                    job={jobs.find((j) => j._id === selectedJobId) as Job}
+                                    candidates={scans.filter((s) => s.jobId === selectedJobId)} // filter scans by job
                                     onBack={() => {
-                                        setActiveView("Active Jobs");
                                         setSelectedJobId(null);
+                                        setActiveView("Active Jobs");
                                     }}
                                     onEdit={() => {
-                                        // find the job from our fetched list
-                                        const job = jobs.find(j => j._id === selectedJobId);
-                                        if (job) {
-                                            setEditingJob(job);
-                                            setShowAddJobModal(true);
-                                        }
+                                        setEditingJob(jobs.find((j) => j._id === selectedJobId) as Job);
+                                        setShowAddJobModal(true);
                                     }}
+                                    onSelectCandidate={(scan) => {
+                                        setSelectedScan(scan);
+                                        setShowScanModal(true);
+                                    }}
+                                    onDeleteCandidate={handleDeleteScan}
                                 />
                             </motion.div>
                         ) : activeView === "Settings & API" ? (
@@ -612,25 +344,16 @@ export default function Dashboard() {
                         ) : !showAllScans ? (
                             /* default dashboard view */
                             <motion.div
-                                key="dashboard-view"
+                                key="dashboard-main"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                exit={{ opacity: 0, scale: 0.98 }}
-                                transition={{ duration: 0.2 }}
                                 className="space-y-6"
                             >
 
-                                <motion.div
-                                    className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.1 }}
-                                >
-                                    <StatCard icon={ScanText} color="bg-[var(--sidebar-bg)]" label="Total Scans" value={DUMMY_STATS.totalScans.value} index={0} />
-                                    <StatCard icon={CheckCircle2} color="bg-emerald-500" label="Shortlisted" value={DUMMY_STATS.shortlisted.value} index={1} />
-                                    <StatCard icon={XCircle} color="bg-red-500" label="Rejected" value={DUMMY_STATS.rejected.value} index={2} />
-                                    <StatCard icon={Sparkles} color="bg-blue-500" label="Credits" value={DUMMY_STATS.credits.value} index={3} />
-                                </motion.div>
+                                <StatsOverview
+                                    stats={stats}
+                                    icons={{ ScanText, CheckCircle2, XCircle, Sparkles }}
+                                />
 
 
                                 <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 items-stretch">
@@ -710,170 +433,27 @@ export default function Dashboard() {
                                         )}
                                     </div>
 
-                                    {/* layoutId="scans-card" powers the expand transition */}
-                                    <motion.div
-                                        layoutId="scans-card"
-                                        className="xl:col-span-3 bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
-                                    >
-                                        <motion.div
-                                            className="p-6 flex-1 flex flex-col"
-                                            initial={{ opacity: 1 }}
-                                            exit={{ opacity: 0 }}
-                                            transition={{ duration: 0.2 }}
-                                        >
-                                            <div className="flex items-center justify-between mb-4">
-                                                <div className="flex items-center gap-2">
-                                                    <Clock className="w-4 h-4 text-[var(--text-secondary)]" />
-                                                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Recent Scans</h3>
-                                                </div>
-                                                <button
-                                                    onClick={() => setShowAllScans(true)}
-                                                    className="text-xs text-[var(--accent)] font-semibold hover:underline flex items-center gap-1"
-                                                >
-                                                    View All <ChevronRight className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                            <div className="overflow-x-auto flex-1">
-                                                <table className="w-full text-left">
-                                                    <TableHeader />
-                                                    <tbody>
-                                                        {scans.slice(0, 5).map((item) => (
-                                                            <tr
-                                                                key={item._id}
-                                                                onClick={() => { setSelectedScan(item); setShowScanModal(true); }}
-                                                                className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer"
-                                                            >
-                                                                <td className="py-4 pr-4">
-                                                                    <div className="flex items-center gap-3">
-                                                                        <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center">
-                                                                            <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <p className="text-sm font-medium text-[var(--text-primary)]">{item.candidateName || "Unknown"}</p>
-                                                                            <p className="text-xs text-[var(--text-secondary)]">{item.filename}</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="py-4 pr-4">
-                                                                    <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)]">
-                                                                        {item.category || "General"}
-                                                                    </span>
-                                                                </td>
-                                                                <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">
-                                                                    {new Date(item.createdAt).toLocaleDateString()}
-                                                                </td>
-                                                                <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}%</td>
-                                                                <td className="py-4">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-emerald-500" : item.status === "Pending" ? "bg-amber-400" : "bg-red-500"}`} />
-                                                                        <span className="text-sm font-medium text-[var(--text-primary)]">{item.status}</span>
-                                                                    </div>
-                                                                </td>
-                                                                <td className="py-4 pr-4 text-right">
-                                                                    <button
-                                                                        onClick={(e) => handleDeleteScan(e, item._id)}
-                                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                                                                        title="Delete Scan"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4" />
-                                                                    </button>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </motion.div>
-                                    </motion.div>
+                                    <RecentScans
+                                        scans={scans}
+                                        onViewAll={() => setShowAllScans(true)}
+                                        onSelectScan={(scan) => {
+                                            setSelectedScan(scan);
+                                            setShowScanModal(true);
+                                        }}
+                                        onDeleteScan={handleDeleteScan}
+                                    />
                                 </div>
                             </motion.div>
                         ) : (
-                            /* shares layoutId with the card above for the expand animation */
-                            <motion.div
-                                key="all-scans-expanded"
-                                layoutId="scans-card"
-                                initial={{ opacity: 0, zIndex: 10 }}
-                                animate={{ opacity: 1, zIndex: 10 }}
-                                exit={{ opacity: 0, zIndex: 10, transition: { duration: 0.2 } }}
-                                transition={{ type: "spring", stiffness: 250, damping: 30 }}
-                                className="bg-white rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
-                            >
-                                <motion.div
-                                    className="p-6 flex-1 flex flex-col"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ delay: 0.15, duration: 0.3 }} // waits for card to settle first
-                                >
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div className="flex items-center gap-3">
-                                            <button
-                                                onClick={() => setShowAllScans(false)}
-                                                className="w-9 h-9 rounded-lg hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
-                                            >
-                                                <ArrowLeft className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
-                                            </button>
-                                            <div>
-                                                <h3 className="text-lg font-bold text-[var(--text-primary)]">All Scans</h3>
-                                                <p className="text-xs text-[var(--text-secondary)]">{DUMMY_RECENTS.length} total results</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="overflow-x-auto flex-1">
-                                        <table className="w-full text-left">
-                                            <TableHeader />
-                                            <tbody>
-                                                {scans.map((item, idx) => (
-                                                    <motion.tr
-                                                        key={item._id}
-                                                        onClick={() => { setSelectedScan(item); setShowScanModal(true); }}
-                                                        initial={{ opacity: 0, x: -10 }}
-                                                        animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: 0.1 + (idx * 0.02) }}
-                                                        className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors cursor-pointer"
-                                                    >
-                                                        <td className="py-4 pr-4">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center">
-                                                                    <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-sm font-medium text-[var(--text-primary)]">{item.candidateName || "Unknown"}</p>
-                                                                    <p className="text-xs text-[var(--text-secondary)]">{item.filename}</p>
-                                                                </div>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 pr-4">
-                                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)]">
-                                                                {item.category || "General"}
-                                                            </span>
-                                                        </td>
-                                                        <td className="py-4 pr-4 text-sm text-[var(--text-secondary)]">
-                                                            {new Date(item.createdAt).toLocaleDateString()}
-                                                        </td>
-                                                        <td className="py-4 pr-4 text-sm font-semibold text-[var(--text-primary)]">{item.score}%</td>
-                                                        <td className="py-4">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`w-2.5 h-2.5 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-emerald-500" : item.status === "Pending" ? "bg-amber-400" : "bg-red-500"}`} />
-                                                                <span className="text-sm font-medium text-[var(--text-primary)]">{item.status}</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="py-4 pr-4 text-right">
-                                                            <button
-                                                                onClick={(e) => handleDeleteScan(e, item._id)}
-                                                                className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
-                                                                title="Delete Scan"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </button>
-                                                        </td>
-                                                    </motion.tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </motion.div>
-                            </motion.div>
+                            <AllScansView
+                                scans={scans}
+                                onBack={() => setShowAllScans(false)}
+                                onSelectScan={(scan) => {
+                                    setSelectedScan(scan);
+                                    setShowScanModal(true);
+                                }}
+                                onDeleteScan={handleDeleteScan}
+                            />
                         )}
                     </AnimatePresence>
                 </main>

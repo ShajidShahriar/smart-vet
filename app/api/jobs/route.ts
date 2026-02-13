@@ -13,7 +13,7 @@ export async function GET() {
         const jobsWithCounts = await Promise.all(
             jobs.map(async (job) => {
                 const candidates = await Scan.countDocuments({ jobId: job._id });
-                const shortlisted = await Scan.countDocuments({ jobId: job._id, status: "Pass" });
+                const shortlisted = await Scan.countDocuments({ jobId: job._id, status: { $in: ["Pass", "Accepted"] } });
                 return {
                     _id: job._id,
                     title: job.title,
