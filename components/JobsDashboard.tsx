@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Plus, Eye, Pencil } from "lucide-react";
 import AddJobModal from "./AddJobModal";
 
-// ─── Dummy Jobs Data ─────────────────────────────────────────────────
+// static data, gets swapped for api calls later
 export const DUMMY_JOBS = [
     { id: 1, title: "Senior React Developer", status: "Active" as const, candidates: 12, shortlisted: 3 },
     { id: 2, title: "UX Designer", status: "Active" as const, candidates: 8, shortlisted: 2 },
@@ -16,7 +16,7 @@ export const DUMMY_JOBS = [
 
 export type Job = typeof DUMMY_JOBS[number];
 
-// ─── Animation ───────────────────────────────────────────────────────
+
 const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: (i: number) => ({
@@ -26,7 +26,7 @@ const cardVariants = {
     }),
 };
 
-// ─── Component ───────────────────────────────────────────────────────
+
 interface JobsDashboardProps {
     onView?: (jobId: number) => void;
     onEdit?: (job: Job) => void;
@@ -42,10 +42,10 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
         setJobStatuses((prev) => ({ ...prev, [id]: !prev[id] }));
     };
 
-    // Global Hotkey 'C'
+    // press 'c' anywhere to create a new job
     React.useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Ignore if typing in an input/textarea
+            // skip if user is typing somewhere
             if (
                 document.activeElement?.tagName === "INPUT" ||
                 document.activeElement?.tagName === "TEXTAREA" ||
@@ -65,14 +65,14 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
 
     return (
         <>
-            {/* Header */}
+
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-[var(--text-primary)]">Active Job Openings</h2>
             </div>
 
-            {/* Cards Grid */}
+
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {/* ─── GHOST CARD (Create New) ─── */}
+                {/* the dashed card that opens the create modal */}
                 {!showModal ? (
                     <motion.button
                         layoutId="create-job-card"
@@ -91,7 +91,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                                 Create New Opening
                             </span>
                         </motion.div>
-                        {/* Hotkey Badge */}
+                        {/* keyboard shortcut hint */}
                         <span className="absolute bottom-4 right-4 text-[10px] font-mono font-medium text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded border border-gray-200 group-hover:border-emerald-200 group-hover:text-emerald-600 group-hover:bg-white transition-colors duration-300">
                             C
                         </span>
@@ -114,7 +114,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                                 }`}
                         >
                             <div className="p-5 flex-1 flex flex-col">
-                                {/* Title + Toggle */}
+
                                 <div className="flex items-start justify-between gap-3 mb-4">
                                     <h3 className="text-sm font-bold text-[var(--text-primary)] leading-snug">
                                         {job.title}
@@ -140,7 +140,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                                     </div>
                                 </div>
 
-                                {/* Stats */}
+
                                 <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] mt-auto">
                                     <span className="font-medium">{job.candidates} Candidates</span>
                                     <span className="w-px h-3.5 bg-gray-200" />
@@ -148,7 +148,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                                 </div>
                             </div>
 
-                            {/* Actions (Full Width) */}
+
                             <div className="px-5 py-3 border-t border-gray-100 bg-gray-50/50 flex items-center gap-2">
                                 <button
                                     onClick={() => onView?.(job.id)}
@@ -170,7 +170,7 @@ export default function JobsDashboard({ onView, onEdit }: JobsDashboardProps) {
                 })}
             </div>
 
-            {/* Modal */}
+
             <AddJobModal isOpen={showModal} onClose={() => setShowModal(false)} layoutId="create-job-card" />
         </>
     );

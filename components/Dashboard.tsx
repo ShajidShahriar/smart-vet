@@ -37,7 +37,7 @@ import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
 import SettingsView from "./SettingsView";
 
-// ─── Dummy Data ──────────────────────────────────────────────────────
+// static data. all of this gets replaced once the api exists
 const DUMMY_USER = {
     name: "Shajid Shahriar",
     role: "Hiring Manager",
@@ -75,7 +75,7 @@ const DUMMY_RECENTS = [
     { id: 20, name: "Laura_Hall_Resume.pdf", date: "Jan 24, 2026", score: "26%", status: "Fail" as const, category: "UX Designer" },
 ];
 
-// ─── Sidebar nav items ──────────────────────────────────────────────
+// these names have to match activeView values exactly or routing breaks
 type NavSection = { label: string; items: { name: string; icon: LucideIcon; active?: boolean; badge?: string }[] };
 const NAV_SECTIONS: NavSection[] = [
     {
@@ -94,7 +94,7 @@ const NAV_SECTIONS: NavSection[] = [
     },
 ];
 
-// ─── Animation ──────────────────────────────────────────────────────
+// delay per card index so they don't all pop in at once
 const fadeUp = {
     hidden: { opacity: 0, y: 16 },
     visible: (i: number) => ({
@@ -104,7 +104,7 @@ const fadeUp = {
     }),
 };
 
-// ─── Stat Card ──────────────────────────────────────────────────────
+
 function StatCard({
     icon: Icon,
     color,
@@ -126,11 +126,11 @@ function StatCard({
             animate="visible"
             className="flex rounded-lg overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
         >
-            {/* Left color block */}
+
             <div className={`${color} w-[72px] flex items-center justify-center shrink-0`}>
                 <Icon className="w-6 h-6 text-white" />
             </div>
-            {/* Right data */}
+
             <div className="flex-1 bg-white px-5 py-4">
                 <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-1">{label}</p>
                 <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
@@ -139,7 +139,7 @@ function StatCard({
     );
 }
 
-// ─── Scan Row (shared) ──────────────────────────────────────────────
+// shared between dashboard preview and expanded view
 function ScanRow({ item }: { item: typeof DUMMY_RECENTS[number] }) {
     return (
         <tr className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors">
@@ -168,7 +168,7 @@ function ScanRow({ item }: { item: typeof DUMMY_RECENTS[number] }) {
     );
 }
 
-// ─── Table Header ───────────────────────────────────────────────────
+
 function TableHeader() {
     return (
         <thead>
@@ -183,7 +183,7 @@ function TableHeader() {
     );
 }
 
-// ─── Component ───────────────────────────────────────────────────────
+
 export default function Dashboard() {
     const [file, setFile] = useState<File | null>(null);
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -261,15 +261,15 @@ export default function Dashboard() {
 
     return (
         <div className="flex min-h-screen bg-[var(--body-bg)]">
-            {/* ─── Sidebar ─────────────────────────────────────────────── */}
+
             <aside className="hidden lg:flex flex-col w-60 bg-[var(--sidebar-bg)] text-white fixed inset-y-0 left-0 z-40">
-                {/* Logo */}
+
                 <div className="flex items-center gap-2.5 px-6 h-16 border-b border-white/[0.06]">
                     <Sparkles className="w-5 h-5 text-[var(--accent)]" />
                     <span className="text-base font-bold tracking-tight">Smart-Vet</span>
                 </div>
 
-                {/* Nav */}
+
                 <nav className="flex-1 overflow-y-auto px-4 py-5 space-y-6">
                     {NAV_SECTIONS.map((section) => (
                         <div key={section.label}>
@@ -304,7 +304,7 @@ export default function Dashboard() {
                     ))}
                 </nav>
 
-                {/* Sidebar footer */}
+
                 <div className="px-4 py-4 border-t border-white/[0.06]">
                     <div className="flex items-center gap-3 px-2">
                         <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
@@ -318,11 +318,11 @@ export default function Dashboard() {
                 </div>
             </aside>
 
-            {/* ─── Mobile Menu (dropdown from top) ───────────────────── */}
+            {/* slides down as an overlay on mobile */}
             <AnimatePresence>
                 {mobileMenuOpen && (
                     <>
-                        {/* Backdrop */}
+
                         <motion.div
                             className="fixed inset-0 bg-black/30 z-40 lg:hidden"
                             initial={{ opacity: 0 }}
@@ -330,7 +330,7 @@ export default function Dashboard() {
                             exit={{ opacity: 0 }}
                             onClick={() => setMobileMenuOpen(false)}
                         />
-                        {/* Dropdown panel */}
+
                         <motion.div
                             className="fixed top-0 left-0 right-0 z-50 bg-[var(--sidebar-bg)] text-white rounded-b-2xl shadow-2xl lg:hidden"
                             initial={{ y: "-100%" }}
@@ -338,7 +338,7 @@ export default function Dashboard() {
                             exit={{ y: "-100%" }}
                             transition={{ type: "spring", damping: 28, stiffness: 300 }}
                         >
-                            {/* Mobile header */}
+
                             <div className="flex items-center justify-between px-6 h-16 border-b border-white/[0.06]">
                                 <div className="flex items-center gap-2.5">
                                     <Sparkles className="w-5 h-5 text-[var(--accent)]" />
@@ -351,7 +351,7 @@ export default function Dashboard() {
                                     <X className="w-5 h-5" />
                                 </button>
                             </div>
-                            {/* Mobile nav */}
+
                             <nav className="px-4 py-4 space-y-4 max-h-[70vh] overflow-y-auto">
                                 {NAV_SECTIONS.map((section) => (
                                     <div key={section.label}>
@@ -385,7 +385,7 @@ export default function Dashboard() {
                                     </div>
                                 ))}
                             </nav>
-                            {/* Mobile footer */}
+
                             <div className="px-6 py-4 border-t border-white/[0.06]">
                                 <div className="flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
@@ -402,11 +402,11 @@ export default function Dashboard() {
                 )}
             </AnimatePresence>
 
-            {/* ─── Main Area ───────────────────────────────────────────── */}
+
             <div className="flex-1 lg:ml-60 flex flex-col">
-                {/* ── Top Bar ────────────────────────────────────────────── */}
+
                 <header className="sticky top-0 z-30 h-16 bg-white border-b border-[var(--card-border)] flex items-center justify-between px-4 sm:px-6 gap-4">
-                    {/* Hamburger + Search */}
+
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setMobileMenuOpen(true)}
@@ -424,7 +424,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    {/* Right actions */}
+
                     <div className="flex items-center gap-2">
                         <button className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors">
                             <Moon className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
@@ -442,11 +442,11 @@ export default function Dashboard() {
                     </div>
                 </header>
 
-                {/* ── Page Content ───────────────────────────────────────── */}
+                {/* activeView controls which page shows up here */}
                 <main className="flex-1 p-6 space-y-6 overflow-y-auto overflow-x-hidden">
                     <AnimatePresence mode="popLayout">
                         {activeView === "Active Jobs" ? (
-                            /* ─── VIEW: JOBS DASHBOARD ─── */
+
                             <motion.div
                                 key="jobs-view"
                                 initial={{ opacity: 0, x: 20 }}
@@ -466,7 +466,7 @@ export default function Dashboard() {
                                 />
                             </motion.div>
                         ) : activeView === "JobDetail" ? (
-                            /* ─── VIEW: JOB DETAIL (LEADERBOARD) ─── */
+
                             <motion.div
                                 key="job-detail-view"
                                 initial={{ opacity: 0, x: 20 }}
@@ -480,12 +480,7 @@ export default function Dashboard() {
                                         setSelectedJobId(null);
                                     }}
                                     onEdit={() => {
-                                        // Find the job data based on selectedJobId
-                                        // For now, we'll just use a placeholder or the editingJob state if already set
-                                        // Ideally, pass the full job object to JobDetailView or fetch it there
-
-                                        // Since JobDetailView uses hardcoded data for now, we'll just open the modal.
-                                        // In a real app, we'd pass the actual job data.
+                                        // using mock data for now, backend will handle this
                                         const mockJob: Job = {
                                             id: selectedJobId || 1,
                                             title: "Senior React Developer",
@@ -499,7 +494,7 @@ export default function Dashboard() {
                                 />
                             </motion.div>
                         ) : activeView === "Settings & API" ? (
-                            /* ─── VIEW: SETTINGS & API ─── */
+
                             <motion.div
                                 key="settings-view"
                                 initial={{ opacity: 0, x: 20 }}
@@ -510,7 +505,7 @@ export default function Dashboard() {
                                 <SettingsView />
                             </motion.div>
                         ) : !showAllScans ? (
-                            /* ─── VIEW 1: DASHBOARD (Stats + Upload + Recent) ─── */
+                            /* default dashboard view */
                             <motion.div
                                 key="dashboard-view"
                                 initial={{ opacity: 0 }}
@@ -519,7 +514,7 @@ export default function Dashboard() {
                                 transition={{ duration: 0.2 }}
                                 className="space-y-6"
                             >
-                                {/* Stat Cards */}
+
                                 <motion.div
                                     className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5"
                                     initial={{ opacity: 0, y: 10 }}
@@ -532,13 +527,13 @@ export default function Dashboard() {
                                     <StatCard icon={Sparkles} color="bg-blue-500" label="Credits" value={DUMMY_STATS.credits.value} index={3} />
                                 </motion.div>
 
-                                {/* Upload + Recents Row */}
+
                                 <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 items-stretch">
-                                    {/* Upload Zone */}
+
                                     <div className="xl:col-span-2 bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 flex flex-col">
                                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Upload Resume</h3>
 
-                                        {/* Job Role Dropdown */}
+                                        {/* validates that a role is picked before allowing upload */}
                                         <div className="relative mb-4">
                                             <select
                                                 value={selectedJobRole}
@@ -610,7 +605,7 @@ export default function Dashboard() {
                                         )}
                                     </div>
 
-                                    {/* Recents Table (Shared Element Source) */}
+                                    {/* layoutId="scans-card" powers the expand transition */}
                                     <motion.div
                                         layoutId="scans-card"
                                         className="xl:col-span-3 bg-white rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] overflow-hidden flex flex-col"
@@ -648,14 +643,14 @@ export default function Dashboard() {
                                 </div>
                             </motion.div>
                         ) : (
-                            /* ─── VIEW 2: ALL SCANS EXPANDED (Shared Element Target) ─── */
+                            /* shares layoutId with the card above for the expand animation */
                             <motion.div
                                 key="all-scans-expanded"
                                 layoutId="scans-card"
-                                initial={{ opacity: 0, zIndex: 10 }} // Ensure it stays on top
+                                initial={{ opacity: 0, zIndex: 10 }}
                                 animate={{ opacity: 1, zIndex: 10 }}
                                 exit={{ opacity: 0, zIndex: 10, transition: { duration: 0.2 } }}
-                                transition={{ type: "spring", stiffness: 250, damping: 30 }} // Smooth spring
+                                transition={{ type: "spring", stiffness: 250, damping: 30 }}
                                 className="bg-white rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
                             >
                                 <motion.div
@@ -663,7 +658,7 @@ export default function Dashboard() {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    transition={{ delay: 0.15, duration: 0.3 }} // Delay content fade-in
+                                    transition={{ delay: 0.15, duration: 0.3 }} // waits for card to settle first
                                 >
                                     <div className="flex items-center justify-between mb-6">
                                         <div className="flex items-center gap-3">
@@ -688,7 +683,7 @@ export default function Dashboard() {
                                                         key={item.id}
                                                         initial={{ opacity: 0, x: -10 }}
                                                         animate={{ opacity: 1, x: 0 }}
-                                                        transition={{ delay: 0.1 + (idx * 0.02) }} // Staggered list
+                                                        transition={{ delay: 0.1 + (idx * 0.02) }}
                                                         className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors"
                                                     >
                                                         <td className="py-4 pr-4">
@@ -718,7 +713,7 @@ export default function Dashboard() {
                     </AnimatePresence>
                 </main>
 
-                {/* ── Footer ─────────────────────────────────────────────── */}
+
                 <footer className="border-t border-[var(--card-border)] bg-white px-6 py-4">
                     <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
                         <p>© 2026 <span className="font-semibold text-[var(--text-primary)]">Smart-Vet</span>. All rights reserved.</p>
@@ -731,7 +726,7 @@ export default function Dashboard() {
                     </div>
                 </footer>
             </div>
-            {/* Add/Edit Job Modal - Moved to Dashboard level for global access */}
+            {/* modal lives here so both jobs dashboard and detail view can trigger it */}
             <AnimatePresence>
                 {showAddJobModal && (
                     <AddJobModal
@@ -743,8 +738,8 @@ export default function Dashboard() {
                         initialData={editingJob ? {
                             id: editingJob.id,
                             title: editingJob.title,
-                            department: "Engineering", // Default/Placeholder
-                            description: "" // Default/Placeholder
+                            department: "Engineering", // placeholder until jobs api exists
+                            description: ""
                         } : undefined}
                         onSave={(jobData) => {
                             console.log("Saved job:", jobData);
@@ -755,7 +750,7 @@ export default function Dashboard() {
                 )}
             </AnimatePresence>
 
-            {/* Toast Notification */}
+            {/* shows up when someone tries uploading without picking a role first */}
             <AnimatePresence>
                 {toast.visible && (
                     <motion.div

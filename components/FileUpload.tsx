@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import pdfToText from "react-pdftotext";
 export default function FileUpload() {
   const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false); 
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(" CLICK DETECTED. Files:", e.target.files);
@@ -14,30 +14,30 @@ export default function FileUpload() {
   };
 
   const handleUpload = async () => {
-    // 1. CHECK
+
     if (!file) return;
 
-    // 2. START LOADING
-    setUploading(true); 
-    
+
+    setUploading(true);
+
     try {
       const text = await pdfToText(file);
 
       const response = await fetch("/api/analyze", {
         method: "POST",
-        headers:{ "Content-Type" : "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          filename : file.name,
+          filename: file.name,
           text: text
         })
       });
 
-      // 6. UNPACK REPLY
+
       const result = await response.json();
 
-      // 7. CHECK RESULT
+
       if (result.success) {
- 
+
         alert("Success! Check your VS Code Terminal.");
       } else {
         alert("Error: " + result.error);
@@ -47,7 +47,7 @@ export default function FileUpload() {
       alert("Something went wrong!");
       console.error(error);
     } finally {
-      setUploading(false); 
+      setUploading(false);
     }
   };
 
@@ -81,11 +81,10 @@ export default function FileUpload() {
 
       {file && (
         <button
-          onClick={handleUpload} 
+          onClick={handleUpload}
           disabled={uploading}
-          className={`mt-6 w-full py-3 rounded-lg font-bold transition ${
-            uploading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-500"
-          }`}
+          className={`mt-6 w-full py-3 rounded-lg font-bold transition ${uploading ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-500"
+            }`}
         >
           {uploading ? "Analyzing..." : `Analyze ${file.name}`}
         </button>

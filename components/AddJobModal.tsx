@@ -10,7 +10,6 @@ interface JobData {
     description: string;
 }
 
-// ─── Component ───────────────────────────────────────────────────────
 interface AddJobModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -25,21 +24,21 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
     const [description, setDescription] = useState("");
     const [errors, setErrors] = useState({ title: false, department: false, description: false });
 
-    // Populate form when initialData changes or reset when modal opens in create mode
+    // sync form fields when switching between create and edit mode
     useEffect(() => {
         if (initialData) {
             setTitle(initialData.title);
-            setDepartment(initialData.department); // Note: In dummy data this might not match dropdown exactly, but good for now
+            setDepartment(initialData.department); // might not match dropdown exactly with dummy data
             setDescription(initialData.description || "");
         } else {
-            // Reset if opening in create mode
+            // clean slate for create mode
             if (isOpen) {
                 setTitle("");
                 setDepartment("");
                 setDescription("");
             }
         }
-        // Reset errors whenever initialData or isOpen changes
+        // clear validation state on mode change
         setErrors({ title: false, department: false, description: false });
     }, [initialData, isOpen]);
 
@@ -64,13 +63,13 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
 
         if (!hasErrors) {
             onSave?.({
-                id: initialData?.id, // Pass id if it exists for editing
+                id: initialData?.id, // keeps the id for edits, undefined for creates
                 title,
                 department,
                 description,
             });
             onClose();
-            // Reset form fields after successful save
+            // clear form after save
             setTitle("");
             setDepartment("");
             setDescription("");
@@ -81,7 +80,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
         <AnimatePresence>
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-                    {/* Backdrop */}
+
                     <motion.div
                         className="absolute inset-0 bg-black/40 backdrop-blur-[2px] pointer-events-auto"
                         onClick={onClose}
@@ -90,20 +89,20 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                         exit={{ opacity: 0 }}
                     />
 
-                    {/* Panel (Shared Element) */}
+                    {/* layoutId connects this to the ghost card in JobsDashboard */}
                     <motion.div
                         layoutId={layoutId}
                         className="pointer-events-auto relative w-full max-w-lg bg-white rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     >
-                        {/* Content Container (Fades in after expansion) */}
+                        {/* content fades in after the panel expands */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ delay: 0.15, duration: 0.2 }}
                         >
-                            {/* Header */}
+
                             <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--card-border)]">
                                 <h2 className="text-lg font-bold text-[var(--text-primary)]">{initialData ? "Edit Job" : "Post New Job"}</h2>
                                 <button
@@ -114,9 +113,9 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                 </button>
                             </div>
 
-                            {/* Body */}
+
                             <div className="px-6 py-5 space-y-5">
-                                {/* Job Title */}
+
                                 <div>
                                     <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                                         Job Title
@@ -132,7 +131,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                     {errors.title && <p className="mt-1 text-xs text-red-500">Job Title is required.</p>}
                                 </div>
 
-                                {/* Department */}
+
                                 <div>
                                     <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                                         Department
@@ -151,7 +150,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                     {errors.department && <p className="mt-1 text-xs text-red-500">Department is required.</p>}
                                 </div>
 
-                                {/* Job Description */}
+
                                 <div>
                                     <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
                                         Job Description
@@ -171,7 +170,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                 </div>
                             </div>
 
-                            {/* Footer */}
+
                             <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
                                 <button
                                     onClick={onClose}

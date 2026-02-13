@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import {
     User,
     CreditCard,
@@ -15,17 +15,17 @@ import {
     Monitor,
 } from "lucide-react";
 
-// ─── Stagger animation ─────────────────────────────────────────────
+// each section drops in from top, staggered by index
 const sectionVariants = {
     hidden: { opacity: 0, y: -30 },
     visible: (i: number) => ({
         opacity: 1,
         y: 0,
-        transition: { delay: i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+        transition: { delay: i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
     }),
 };
 
-// ─── Section wrapper ────────────────────────────────────────────────
+// wraps each settings section with icon + title + drop animation
 function Section({ index, icon: Icon, title, children }: { index: number; icon: React.ElementType; title: string; children: React.ReactNode }) {
     return (
         <motion.div
@@ -46,7 +46,7 @@ function Section({ index, icon: Icon, title, children }: { index: number; icon: 
     );
 }
 
-// ─── Main Component ─────────────────────────────────────────────────
+
 export default function SettingsView() {
     return (
         <div className="space-y-8 max-w-3xl">
@@ -66,9 +66,7 @@ export default function SettingsView() {
     );
 }
 
-// ═════════════════════════════════════════════════════════════════════
-// SECTION 1: PROFILE & ACCOUNT
-// ═════════════════════════════════════════════════════════════════════
+
 function ProfileContent() {
     const [fullName, setFullName] = useState("Shajid Shahriar");
     const [jobTitle, setJobTitle] = useState("Hiring Manager");
@@ -98,7 +96,7 @@ function ProfileContent() {
 
     return (
         <div className="space-y-4">
-            {/* Avatar + Personal Info card */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
                 <div className="flex items-center gap-6 mb-6 pb-6 border-b border-[var(--card-border)]">
                     <label
@@ -106,8 +104,8 @@ function ProfileContent() {
                         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                         onDragLeave={() => setIsDragOver(false)}
                         className={`w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer overflow-hidden transition-all shrink-0 ${isDragOver
-                                ? "border-[var(--accent)] bg-[var(--accent-light)]"
-                                : "border-[var(--card-border)] hover:border-[var(--accent)] hover:bg-[var(--accent-light)]/50"
+                            ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                            : "border-[var(--card-border)] hover:border-[var(--accent)] hover:bg-[var(--accent-light)]/50"
                             }`}
                     >
                         {avatarPreview ? (
@@ -142,7 +140,7 @@ function ProfileContent() {
                 </div>
             </div>
 
-            {/* Danger Zone */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--danger)]/30 shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex items-center justify-between gap-4">
                 <div>
                     <p className="text-sm font-semibold text-[var(--danger)]">Danger Zone</p>
@@ -156,9 +154,7 @@ function ProfileContent() {
     );
 }
 
-// ═════════════════════════════════════════════════════════════════════
-// SECTION 2: SUBSCRIPTION & USAGE
-// ═════════════════════════════════════════════════════════════════════
+
 function SubscriptionContent() {
     const creditsUsed = 7;
     const creditsTotal = 10;
@@ -186,7 +182,7 @@ function SubscriptionContent() {
                     </div>
                 </div>
 
-                {/* Usage bar */}
+
                 <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-[var(--text-secondary)] text-xs font-medium">API Credits Used</span>
                     <span className="font-bold text-sm text-[var(--text-primary)]">{creditsUsed}/{creditsTotal}</span>
@@ -197,7 +193,7 @@ function SubscriptionContent() {
                 <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets March 1, 2026.</p>
             </div>
 
-            {/* Upgrade CTA */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex items-center justify-between gap-4">
                 <div>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">Need more power?</p>
@@ -209,9 +205,7 @@ function SubscriptionContent() {
     );
 }
 
-// ═════════════════════════════════════════════════════════════════════
-// SECTION 3: API & AI ENGINE
-// ═════════════════════════════════════════════════════════════════════
+
 function ApiEngineContent() {
     const [apiKey, setApiKey] = useState("");
     const [showKey, setShowKey] = useState(false);
@@ -222,7 +216,7 @@ function ApiEngineContent() {
 
     return (
         <div className="space-y-4">
-            {/* BYOK */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Bring Your Own Key (BYOK)</h3>
                 <p className="text-xs text-[var(--text-secondary)] mb-4">Your key is stored securely and never shared.</p>
@@ -242,9 +236,9 @@ function ApiEngineContent() {
                 <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">Get your key from <span className="text-[var(--accent)] font-medium">Google AI Studio</span></p>
             </div>
 
-            {/* Model + Strictness in one card */}
+            {/* grouped together because they both affect ai behavior */}
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 space-y-6">
-                {/* Model */}
+
                 <div>
                     <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">AI Model</label>
                     <div className="relative">
@@ -259,7 +253,7 @@ function ApiEngineContent() {
                     </div>
                 </div>
 
-                {/* Strictness */}
+
                 <div>
                     <div className="flex items-center justify-between mb-2">
                         <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Grading Strictness</label>
@@ -281,9 +275,7 @@ function ApiEngineContent() {
     );
 }
 
-// ═════════════════════════════════════════════════════════════════════
-// SECTION 4: PREFERENCES
-// ═════════════════════════════════════════════════════════════════════
+
 function PreferencesContent() {
     const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
     const [notifHighScore, setNotifHighScore] = useState(true);
@@ -298,7 +290,7 @@ function PreferencesContent() {
 
     return (
         <div className="space-y-4">
-            {/* Theme */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Theme</h3>
                 <p className="text-xs text-[var(--text-secondary)] mb-4">Choose your preferred appearance.</p>
@@ -308,8 +300,8 @@ function PreferencesContent() {
                             key={opt.id}
                             onClick={() => setTheme(opt.id)}
                             className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${theme === opt.id
-                                    ? "border-[var(--accent)] bg-[var(--accent-light)]"
-                                    : "border-[var(--card-border)] hover:border-[var(--accent)]/50 bg-[var(--body-bg)]"
+                                ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                                : "border-[var(--card-border)] hover:border-[var(--accent)]/50 bg-[var(--body-bg)]"
                                 }`}
                         >
                             <opt.icon className={`w-5 h-5 ${theme === opt.id ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"}`} />
@@ -319,7 +311,7 @@ function PreferencesContent() {
                 </div>
             </div>
 
-            {/* Notifications */}
+
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
                 <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Notifications</h3>
                 <p className="text-xs text-[var(--text-secondary)] mb-4">Control which events trigger notifications.</p>
@@ -337,7 +329,7 @@ function PreferencesContent() {
     );
 }
 
-// ─── Checkbox ───────────────────────────────────────────────────────
+
 function CheckboxRow({ checked, onChange, label, desc }: { checked: boolean; onChange: (v: boolean) => void; label: string; desc: string }) {
     return (
         <label className="flex items-start gap-3 cursor-pointer group" onClick={() => onChange(!checked)}>

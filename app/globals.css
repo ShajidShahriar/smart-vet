@@ -32,7 +32,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom scrollbar */
+/* keeps scrollbars thin and out of the way */
 ::-webkit-scrollbar {
   width: 5px;
 }

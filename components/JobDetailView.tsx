@@ -16,7 +16,7 @@ interface JobDetailViewProps {
 }
 
 export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
-    // 1. HARDCODED JOB DATA
+    // static for now, backend will feed this per jobId
     const job = {
         title: "Senior React Developer",
         department: "Engineering",
@@ -27,7 +27,7 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
         description: "We are looking for a Senior React Developer with 5+ years of experience..."
     };
 
-    // 2. HARDCODED CANDIDATE LEADERBOARD
+    // fake candidates. scan results will replace this once wired
     const candidates = [
         { id: 1, rank: 1, name: "Liam Johnson", role: "Frontend Lead", score: 98, status: "Shortlisted", avatar: "LJ" },
         { id: 2, rank: 2, name: "Olivia Smith", role: "Senior Engineer", score: 94, status: "Shortlisted", avatar: "OS" },
@@ -39,7 +39,7 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
     return (
         <div className="min-h-screen bg-[var(--body-bg)] p-8 font-sans text-[var(--text-primary)]">
 
-            {/* ─── HEADER ─────────────────────────────────────────────────── */}
+
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-4">
                     <button
@@ -80,10 +80,10 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
 
             <div className="grid grid-cols-12 gap-8">
 
-                {/* ─── LEFT: THE LEADERBOARD (8 cols) ──────────────────────── */}
+                {/* ranked candidates table */}
                 <div className="col-span-12 xl:col-span-8 space-y-6">
 
-                    {/* Filters Bar */}
+
                     <div className="bg-[var(--card-bg)] p-2 rounded-lg border border-[var(--card-border)] shadow-sm flex justify-between">
                         <div className="relative flex-1 max-w-md">
                             <Search className="absolute left-3 top-2.5 text-[var(--text-secondary)]" size={18} />
@@ -99,7 +99,7 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
                         </div>
                     </div>
 
-                    {/* The Table */}
+
                     <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-sm overflow-hidden">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -167,10 +167,10 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
                     </div>
                 </div>
 
-                {/* ─── RIGHT: THE CONTEXT SIDEBAR (4 cols) ────────────────── */}
+                {/* context panel: job details and required skills */}
                 <div className="col-span-12 xl:col-span-4 space-y-6">
 
-                    {/* Ranking Criteria Card */}
+                    {/* these skills get used in ai scoring, order matters */}
                     <div className="bg-[var(--card-bg)] rounded-lg p-6 border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
                         <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-tight mb-4">
                             Ranking Criteria
@@ -212,7 +212,7 @@ export default function JobDetailView({ onBack, onEdit }: JobDetailViewProps) {
                         </div>
                     </div>
 
-                    {/* Description Preview */}
+
                     <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] p-6 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
                         <div className="flex justify-between items-center mb-4">
                             <h3 className="font-bold text-[var(--text-primary)]">Job Description</h3>
