@@ -3,9 +3,6 @@ import Google from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import clientPromise from "./mongodb-client";
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
-console.log("DEBUG: GOOGLE_CLIENT_ID loaded:", clientId ? clientId.substring(0, 15) + "..." : "undefined");
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
     adapter: MongoDBAdapter(clientPromise),
     providers: [

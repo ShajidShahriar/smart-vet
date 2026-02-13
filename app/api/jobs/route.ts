@@ -2,12 +2,19 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Job from "@/lib/models/Job";
 import Scan from "@/lib/models/Scan";
+import { auth } from "@/lib/auth";
 
-// returns all jobs, newest first, with candidate counts from scans
+// returns all jobs for the authenticated user, newest first
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         await dbConnect();
-        const jobs = await Job.find().sort({ createdAt: -1 }).lean();
+        const userId = session.user.id;
+        const jobs = await Job.find({ userId }).sort({ createdAt: -1 }).lean();
 
         // count scans per job so the cards show real numbers
         const jobsWithCounts = await Promise.all(
@@ -37,9 +44,19 @@ export async function GET() {
 
 export async function POST(req: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         await dbConnect();
         const body = await req.json();
-        const job = await Job.create(body);
+
+        const job = await Job.create({
+            ...body,
+            userId: session.user.id
+        });
+
         return NextResponse.json(job, { status: 201 });
     } catch (error) {
         console.error("POST /api/jobs failed:", error);

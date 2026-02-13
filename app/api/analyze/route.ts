@@ -6,8 +6,15 @@ import { analyzeResume } from "@/lib/gemini";
 import { writeFile } from "fs/promises";
 import path from "path";
 
+import { auth } from "@/lib/auth";
+
 export async function POST(req: Request) {
   try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     await dbConnect();
 
     // handle form data for file upload
@@ -32,12 +39,12 @@ export async function POST(req: Request) {
     await writeFile(path.join(uploadDir, uniqueFilename), buffer);
 
     // find the job so we can use its description in the prompt
-    const job = await Job.findOne({ title: jobTitle }).lean();
+    // ALSO ensure the job belongs to this user to prevent scanning against other people's jobs
+    const job = await Job.findOne({ title: jobTitle, userId: session.user.id }).lean();
     if (!job) {
-      return NextResponse.json({ error: "job not found" }, { status: 404 });
+      return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
     }
 
-    // retrieving configuration from headers (BYOK support)
     // retrieving configuration from headers (BYOK support)
     const apiKey = req.headers.get("x-gemini-api-key") || undefined;
     const strictness = parseInt(req.headers.get("x-gemini-strictness") || "50");
@@ -53,6 +60,7 @@ export async function POST(req: Request) {
     // persist the scan result
     const scan = await Scan.create({
       jobId: (job as Record<string, unknown>)._id,
+      userId: session.user.id,
       filename: uniqueFilename, // save the actual disk filename
       candidateName: result.candidateName,
       score: result.score,

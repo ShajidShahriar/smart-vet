@@ -1,17 +1,29 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Job from "@/lib/models/Job";
+import { auth } from "@/lib/auth";
 
 // partial update, like toggling status or editing fields
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         await dbConnect();
         const { id } = await params;
         const body = await req.json();
-        const job = await Job.findByIdAndUpdate(id, body, { new: true, runValidators: true }).lean();
+
+        // ensure job belongs to user
+        const job = await Job.findOneAndUpdate(
+            { _id: id, userId: session.user.id },
+            body,
+            { new: true, runValidators: true }
+        ).lean();
 
         if (!job) {
-            return NextResponse.json({ error: "job not found" }, { status: 404 });
+            return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
         }
 
         return NextResponse.json(job);
@@ -23,12 +35,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
 export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
         await dbConnect();
         const { id } = await params;
-        const job = await Job.findByIdAndDelete(id).lean();
+
+        // ensure job belongs to user
+        const job = await Job.findOneAndDelete({ _id: id, userId: session.user.id }).lean();
 
         if (!job) {
-            return NextResponse.json({ error: "job not found" }, { status: 404 });
+            return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
         }
 
         return NextResponse.json({ success: true });

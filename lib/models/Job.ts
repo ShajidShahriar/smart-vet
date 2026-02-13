@@ -1,6 +1,8 @@
 import mongoose, { Schema, models, model } from "mongoose";
 
 const JobSchema = new Schema({
+    // user ownership
+    userId: { type: String, required: true, index: true },
     title: { type: String, required: true },
     department: { type: String, required: true },
     description: { type: String, default: "" },
