@@ -11,7 +11,7 @@ const cardVariants = {
     visible: (i: number) => ({
         opacity: 1,
         y: 0,
-        transition: { delay: i * 0.07, duration: 0.35, ease: "easeOut" as const },
+        transition: { delay: i * 0.02, duration: 0.15, ease: "easeOut" as const },
     }),
 };
 
@@ -93,6 +93,11 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
                 {!showModal ? (
                     <motion.button
                         layoutId="create-job-card"
+                        custom={0}
+                        variants={cardVariants}
+                        initial="hidden"
+                        animate="visible"
+                        transition={{ type: "spring", stiffness: 550, damping: 38, mass: 0.8 }}
                         onClick={() => setShowModal(true)}
                         className="group w-full min-h-[180px] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 bg-transparent hover:bg-emerald-50/60 hover:border-emerald-300 transition-all duration-300 cursor-pointer relative"
                     >
@@ -116,7 +121,7 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
                         <motion.div
                             key={job._id}
                             layout
-                            custom={i}
+                            custom={i + 1}
                             variants={cardVariants}
                             initial="hidden"
                             animate="visible"

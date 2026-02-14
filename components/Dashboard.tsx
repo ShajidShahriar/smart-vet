@@ -314,7 +314,7 @@ export default function Dashboard() {
 
                 {/* activeView controls which page shows up here */}
                 <main className="flex-1 p-6 space-y-6 overflow-y-auto overflow-x-hidden">
-                    <AnimatePresence mode="popLayout">
+                    <AnimatePresence mode="wait">
                         {activeView === "Active Jobs" ? (
 
                             <motion.div

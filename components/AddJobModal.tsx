@@ -93,14 +93,17 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                     <motion.div
                         layoutId={layoutId}
                         className="pointer-events-auto relative w-full max-w-lg bg-[var(--card-bg)] rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                        initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                        transition={{ type: "spring", stiffness: 550, damping: 38, mass: 0.8 }}
                     >
                         {/* content fades in after the panel expands */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ delay: 0.15, duration: 0.2 }}
+                            exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                            transition={{ duration: 0.2 }}
                         >
 
                             <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--card-border)]">
