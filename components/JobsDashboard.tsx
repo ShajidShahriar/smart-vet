@@ -85,12 +85,6 @@ export default function JobsDashboard({ jobs, onView, onEdit, onRefresh }: JobsD
         <>
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Active Jobs</h2>
-                <button
-                    onClick={() => setShowModal(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
-                >
-                    <Plus className="w-4 h-4" /> Post New Job
-                </button>
             </div>
 
 

@@ -171,10 +171,10 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                             </div>
 
 
-                            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-gray-100">
+                            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[var(--body-bg)] border-t border-[var(--card-border)]">
                                 <button
                                     onClick={onClose}
-                                    className="px-5 py-2.5 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:bg-gray-200/50 hover:text-[var(--text-primary)] transition-colors"
+                                    className="px-5 py-2.5 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--card-border)] hover:text-[var(--text-primary)] transition-colors"
                                 >
                                     Cancel
                                 </button>
