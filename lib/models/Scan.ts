@@ -6,6 +6,7 @@ const ScanSchema = new Schema({
     // user ownership
     userId: { type: String, required: true, index: true },
     filename: { type: String, required: true },
+    fileUrl: { type: String }, // url to the file in blob storage
     candidateName: { type: String, default: "" },
     score: { type: Number, required: true },
     status: { type: String, enum: ["Pending", "Accepted", "Rejected", "Pass", "Fail"], default: "Pending" },

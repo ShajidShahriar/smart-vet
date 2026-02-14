@@ -3,9 +3,7 @@ import dbConnect from "@/lib/mongodb";
 import Job from "@/lib/models/Job";
 import Scan from "@/lib/models/Scan";
 import { analyzeResume } from "@/lib/gemini";
-import { writeFile } from "fs/promises";
-import path from "path";
-
+import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 
 export async function POST(req: Request) {
@@ -30,13 +28,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // save file to public/uploads
-    // unique filename to prevent collisions? for now exact name is fine for demo
-    // but lets prepend timestamp to be safe
-    const uniqueFilename = `${Date.now()}-${file.name}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await writeFile(path.join(uploadDir, uniqueFilename), buffer);
+    // Upload to Vercel Blob
+    const blob = await put(file.name, file, {
+      access: 'public',
+    });
 
     // find the job so we can use its description in the prompt
     // ALSO ensure the job belongs to this user to prevent scanning against other people's jobs
@@ -61,7 +56,8 @@ export async function POST(req: Request) {
     const scan = await Scan.create({
       jobId: (job as Record<string, unknown>)._id,
       userId: session.user.id,
-      filename: uniqueFilename, // save the actual disk filename
+      filename: file.name, // save the actual filename
+      fileUrl: blob.url, // save the blob url
       candidateName: result.candidateName,
       score: result.score,
       status: "Pending", // initial status is pending review
@@ -74,6 +70,7 @@ export async function POST(req: Request) {
       scan: {
         _id: scan._id,
         filename: scan.filename,
+        fileUrl: scan.fileUrl,
         candidateName: result.candidateName,
         score: result.score,
         status: scan.status,

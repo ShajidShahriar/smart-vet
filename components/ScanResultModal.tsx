@@ -105,7 +105,7 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                                     <div className="flex items-center gap-3 text-xs text-gray-400 pt-2 border-t border-gray-100">
                                         <FileText className="w-4 h-4" />
                                         <a
-                                            href={`/uploads/${scan.filename}`}
+                                            href={(scan as any).fileUrl || `/uploads/${scan.filename}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-[var(--accent)] hover:underline transition-colors cursor-pointer"
