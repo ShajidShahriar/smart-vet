@@ -12,18 +12,18 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 // names must match activeView values in the main dashboard state
-type NavSection = { label: string; items: { name: string; icon: LucideIcon; active?: boolean; badge?: string }[] };
+type NavSection = { label: string; items: { name: string; icon: LucideIcon; active?: boolean; badge?: string | number }[] };
 const NAV_SECTIONS: NavSection[] = [
     {
         label: "Menu", // kept for key but hidden in UI
         items: [
-            { name: "Dashboard", icon: LayoutGrid, badge: "5" },
+            { name: "Dashboard", icon: LayoutGrid },
         ],
     },
     {
         label: "Configuration", // kept for key but hidden in UI
         items: [
-            { name: "Active Jobs", icon: Briefcase, badge: "New" },
+            { name: "Active Jobs", icon: Briefcase },
             { name: "Settings & API", icon: Settings },
         ],
     },
@@ -36,6 +36,10 @@ interface SidebarProps {
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (open: boolean) => void;
     user: { name: string; role: string };
+    badges?: {
+        dashboard?: number;
+        activeJobs?: number;
+    };
 }
 
 export default function Sidebar({
@@ -44,8 +48,16 @@ export default function Sidebar({
     setShowAllScans,
     mobileMenuOpen,
     setMobileMenuOpen,
-    user
+    user,
+    badges
 }: SidebarProps) {
+    // Helper to get badge content
+    const getBadge = (itemName: string) => {
+        if (itemName === "Dashboard" && badges?.dashboard) return badges.dashboard;
+        if (itemName === "Active Jobs" && badges?.activeJobs) return badges.activeJobs;
+        return null;
+    };
+
     return (
         <>
             <aside className="hidden lg:flex flex-col w-60 bg-[var(--sidebar-bg)] text-white fixed inset-y-0 left-0 z-40">
@@ -62,28 +74,31 @@ export default function Sidebar({
                         <div key={section.label}>
                             {/* Section label removed per request */}
                             <ul className="space-y-1">
-                                {section.items.map((item) => (
-                                    <li key={item.name}>
-                                        <button
-                                            onClick={() => { setActiveView(item.name); setShowAllScans(false); }}
-                                            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
-                                                ? "bg-emerald-500 text-white font-semibold"
-                                                : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
-                                                }`}
-                                        >
-                                            <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
-                                            <span className="flex-1 text-left">{item.name}</span>
-                                            {item.badge && (
-                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
-                                                    ? "bg-white/20 text-white"
-                                                    : "bg-slate-700 text-slate-300"
-                                                    }`}>
-                                                    {item.badge}
-                                                </span>
-                                            )}
-                                        </button>
-                                    </li>
-                                ))}
+                                {section.items.map((item) => {
+                                    const badgeCount = getBadge(item.name);
+                                    return (
+                                        <li key={item.name}>
+                                            <button
+                                                onClick={() => { setActiveView(item.name); setShowAllScans(false); }}
+                                                className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
+                                                    ? "bg-emerald-500 text-white font-semibold"
+                                                    : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
+                                                    }`}
+                                            >
+                                                <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
+                                                <span className="flex-1 text-left">{item.name}</span>
+                                                {badgeCount ? (
+                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
+                                                        ? "bg-white/20 text-white"
+                                                        : "bg-slate-700 text-slate-300"
+                                                        }`}>
+                                                        {badgeCount}
+                                                    </span>
+                                                ) : null}
+                                            </button>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </div>
                     ))}
@@ -142,28 +157,31 @@ export default function Sidebar({
                                     <div key={section.label}>
                                         {/* Section label removed */}
                                         <ul className="space-y-1">
-                                            {section.items.map((item) => (
-                                                <li key={item.name}>
-                                                    <button
-                                                        onClick={() => { setActiveView(item.name); setShowAllScans(false); setMobileMenuOpen(false); }}
-                                                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
-                                                            ? "bg-emerald-500 text-white font-semibold"
-                                                            : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
-                                                            }`}
-                                                    >
-                                                        <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
-                                                        <span className="flex-1 text-left">{item.name}</span>
-                                                        {item.badge && (
-                                                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
-                                                                ? "bg-white/20 text-white"
-                                                                : "bg-slate-700 text-slate-300"
-                                                                }`}>
-                                                                {item.badge}
-                                                            </span>
-                                                        )}
-                                                    </button>
-                                                </li>
-                                            ))}
+                                            {section.items.map((item) => {
+                                                const badgeCount = getBadge(item.name);
+                                                return (
+                                                    <li key={item.name}>
+                                                        <button
+                                                            onClick={() => { setActiveView(item.name); setShowAllScans(false); setMobileMenuOpen(false); }}
+                                                            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-[13px] transition-all duration-200 ${activeView === item.name
+                                                                ? "bg-emerald-500 text-white font-semibold"
+                                                                : "text-slate-400 font-medium hover:text-slate-200 hover:bg-white/[0.05]"
+                                                                }`}
+                                                        >
+                                                            <item.icon className={`w-[18px] h-[18px] transition-colors duration-200 ${activeView === item.name ? "text-white" : ""}`} />
+                                                            <span className="flex-1 text-left">{item.name}</span>
+                                                            {badgeCount ? (
+                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${activeView === item.name
+                                                                    ? "bg-white/20 text-white"
+                                                                    : "bg-slate-700 text-slate-300"
+                                                                    }`}>
+                                                                    {badgeCount}
+                                                                </span>
+                                                            ) : null}
+                                                        </button>
+                                                    </li>
+                                                );
+                                            })}
                                         </ul>
                                     </div>
                                 ))}

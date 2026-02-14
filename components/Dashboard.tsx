@@ -258,6 +258,10 @@ export default function Dashboard() {
                 mobileMenuOpen={mobileMenuOpen}
                 setMobileMenuOpen={setMobileMenuOpen}
                 user={DUMMY_USER}
+                badges={{
+                    dashboard: scans.filter(s => s.status === "Pending").length,
+                    activeJobs: jobs.filter(j => j.status === "Active").length
+                }}
             />
 
             {/* main content */}
