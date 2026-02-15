@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Smart-Vet
 
-## Getting Started
+**AI-Powered Resume & Job Description Analyzer**
 
-First, run the development server:
+[Live Demo](https://smart-vet-weld.vercel.app)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## About The Project
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Smart-Vet is an intelligent career tool designed to bridge the gap between job seekers and applicant tracking systems (ATS). By leveraging Google's **Gemini AI**, it analyzes resumes against specific job descriptions to provide actionable feedback, match scoring, and optimization suggestions.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The goal is simple : help candidates understand exactly why they might be getting rejected and how to fix it in seconds.
 
-## Learn More
+## Key Features
 
-To learn more about Next.js, take a look at the following resources:
+* **AI-Driven Analysis** : Utilizes the Gemini API to deeply understand context, skills, and nuances in both the CV and Job Description.
+* **Match Scoring** : Provides a quantified "Match Percentage" to gauge application strength instantly.
+* **Gap Identification** : Highlights missing keywords and skills that the employer is specifically looking for.
+* **Actionable Feedback** : Offers concrete, tailored advice on how to rephrase bullet points and summaries for better impact.
+* **Secure & Fast** : Built with Next.js for server-side rendering performance and secure API handling.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Frontend**
+* Next.js
+* React.js
+* Tailwind CSS
+* Framer Motion (Animations)
 
-## Deploy on Vercel
+**Backend & AI**
+* Node.js (Server Actions)
+* Google Gemini API (Generative AI)
+* MongoDB (User Data & History)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## How to Use
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Since this is a web-based application, no installation is required. You can access the tool directly via the [Live Demo](https://smart-vet-weld.vercel.app).
+
+1.  **Input Job Details** : Paste the Job Description (JD) into the designated text area.
+2.  **Upload Resume** : Upload your Resume (PDF) or paste the text content.
+3.  **Analyze** : Click the analysis button to trigger the Gemini AI agent.
+4.  **Review** : Receive your match score, missing keywords, and specific improvement suggestions.
+
+
+## Contact
+
+**Shajid Shahriar**
+* Website : [shajidshahriar.codes](https://portfolio-v2-delta-self.vercel.app/#projects)
+* Email : shajidsr12@gmail.com
+* LinkedIn : [shajid-shahriar](https://linkedin.com/in/shajid-shahriar-194301292)
