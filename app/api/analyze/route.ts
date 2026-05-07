@@ -31,6 +31,8 @@ export async function POST(req: Request) {
     // Upload to Vercel Blob
     const blob = await put(file.name, file, {
       access: 'public',
+      addRandomSuffix: true,
+
     });
 
     // find the job so we can use its description in the prompt

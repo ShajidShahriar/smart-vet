@@ -55,6 +55,7 @@ export default function Dashboard() {
     const [editingJob, setEditingJob] = useState<Job | null>(null);
     const [showAddJobModal, setShowAddJobModal] = useState(false);
     const [uploading, setUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true); // Initial page load state
     const [isDragOver, setIsDragOver] = useState(false);
     const [showAllScans, setShowAllScans] = useState(false);
     const [activeView, setActiveView] = useState<string>("Dashboard");
@@ -91,10 +92,17 @@ export default function Dashboard() {
         }
     }, []);
 
-    // load data on mount
+    // load data on mount with animation delay
     useEffect(() => {
-        fetchJobs();
-        fetchScans();
+        const loadData = async () => {
+            await Promise.all([
+                fetchJobs(),
+                fetchScans(),
+                new Promise((resolve) => setTimeout(resolve, 2000)) // Force 2s animation
+            ]);
+            setIsLoading(false);
+        };
+        loadData();
     }, [fetchJobs, fetchScans]);
 
     const showToast = useCallback((message: string) => {
@@ -250,7 +258,7 @@ export default function Dashboard() {
 
     return (
         <div className="flex min-h-screen bg-[var(--body-bg)]">
-            <ScanningOverlay isAnalyzing={uploading} />
+            <ScanningOverlay isAnalyzing={uploading || isLoading} />
             <Sidebar
                 activeView={activeView}
                 setActiveView={setActiveView}
