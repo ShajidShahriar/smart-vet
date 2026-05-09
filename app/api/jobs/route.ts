@@ -16,24 +16,43 @@ export async function GET() {
         const userId = session.user.id;
         const jobs = await Job.find({ userId }).sort({ createdAt: -1 }).lean();
 
-        // count scans per job so the cards show real numbers
-        const jobsWithCounts = await Promise.all(
-            jobs.map(async (job) => {
-                const candidates = await Scan.countDocuments({ jobId: job._id });
-                const shortlisted = await Scan.countDocuments({ jobId: job._id, status: { $in: ["Pass", "Accepted"] } });
-                return {
-                    _id: job._id,
-                    title: job.title,
-                    department: job.department,
-                    description: job.description,
-                    status: job.status,
-                    skills: job.skills,
-                    candidates,
-                    shortlisted,
-                    createdAt: job.createdAt,
-                };
-            })
+        // batch-count all scan stats in a single aggregation instead of N+1 queries
+        const jobIds = jobs.map(j => j._id);
+        const scanStats = await Scan.aggregate([
+            { $match: { jobId: { $in: jobIds } } },
+            {
+                $group: {
+                    _id: "$jobId",
+                    candidates: { $sum: 1 },
+                    shortlisted: {
+                        $sum: { $cond: [{ $in: ["$status", ["Pass", "Accepted"]] }, 1, 0] },
+                    },
+                },
+            },
+        ]);
+
+        // build a lookup map for O(1) access
+        const statsMap = new Map(
+            scanStats.map((s: { _id: string; candidates: number; shortlisted: number }) => [
+                s._id.toString(),
+                { candidates: s.candidates, shortlisted: s.shortlisted },
+            ])
         );
+
+        const jobsWithCounts = jobs.map(job => {
+            const counts = statsMap.get(job._id.toString()) || { candidates: 0, shortlisted: 0 };
+            return {
+                _id: job._id,
+                title: job.title,
+                department: job.department,
+                description: job.description,
+                status: job.status,
+                skills: job.skills,
+                candidates: counts.candidates,
+                shortlisted: counts.shortlisted,
+                createdAt: job.createdAt,
+            };
+        });
 
         return NextResponse.json(jobsWithCounts);
     } catch (error) {

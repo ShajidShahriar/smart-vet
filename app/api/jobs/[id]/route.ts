@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Job from "@/lib/models/Job";
+import Scan from "@/lib/models/Scan";
 import { auth } from "@/lib/auth";
 
 // partial update, like toggling status or editing fields
@@ -49,6 +50,9 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         if (!job) {
             return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
         }
+
+        // cascade: remove all scans tied to this job
+        await Scan.deleteMany({ jobId: id });
 
         return NextResponse.json({ success: true });
     } catch (error) {

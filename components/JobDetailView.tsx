@@ -17,11 +17,12 @@ interface JobDetailViewProps {
     candidates: Scan[];
     onBack: () => void;
     onEdit: () => void;
+    onDeleteJob: () => void;
     onSelectCandidate: (scan: Scan) => void;
     onDeleteCandidate: (e: React.MouseEvent, id: string) => void;
 }
 
-export default function JobDetailView({ job, candidates, onBack, onEdit, onSelectCandidate, onDeleteCandidate }: JobDetailViewProps) {
+export default function JobDetailView({ job, candidates, onBack, onEdit, onDeleteJob, onSelectCandidate, onDeleteCandidate }: JobDetailViewProps) {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [statusFilter, setStatusFilter] = React.useState<string>("All");
     const [minScore, setMinScore] = React.useState<string>("0");
@@ -107,6 +108,13 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                 </div>
 
                 <div className="flex gap-3">
+                    <button
+                        onClick={onDeleteJob}
+                        className="bg-[var(--card-bg)] border border-[var(--danger)]/30 text-[var(--danger)] hover:bg-[var(--danger)] hover:text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                        <Trash2 size={14} />
+                        Delete
+                    </button>
                     <button
                         onClick={onEdit}
                         className="bg-[var(--card-bg)] border border-[var(--card-border)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-gray-300 px-4 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm"

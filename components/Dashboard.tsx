@@ -358,6 +358,19 @@ export default function Dashboard() {
                                         setEditingJob(jobs.find((j) => j._id === selectedJobId) as Job);
                                         setShowAddJobModal(true);
                                     }}
+                                    onDeleteJob={async () => {
+                                        if (!confirm("Delete this job and all its data? This cannot be undone.")) return;
+                                        try {
+                                            await fetch(`/api/jobs/${selectedJobId}`, { method: "DELETE" });
+                                            setSelectedJobId(null);
+                                            setActiveView("Active Jobs");
+                                            fetchJobs();
+                                            fetchScans();
+                                            showToast("Job deleted successfully");
+                                        } catch {
+                                            showToast("Failed to delete job");
+                                        }
+                                    }}
                                     onSelectCandidate={(scan) => {
                                         setSelectedScan(scan);
                                         setShowScanModal(true);
@@ -385,6 +398,30 @@ export default function Dashboard() {
                                 className="space-y-6"
                             >
 
+                                {jobs.length === 0 && scans.length === 0 ? (
+                                    /* empty state for brand-new users */
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: 0.1 }}
+                                        className="flex flex-col items-center justify-center py-20 text-center"
+                                    >
+                                        <div className="w-20 h-20 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center mb-6">
+                                            <Sparkles className="w-10 h-10 text-[var(--accent)]" />
+                                        </div>
+                                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Welcome to Smart-Vet</h2>
+                                        <p className="text-[var(--text-secondary)] text-sm max-w-md mb-8 leading-relaxed">
+                                            Start by creating a job posting. Once you have a role, you can upload resumes and let AI score candidates against your requirements.
+                                        </p>
+                                        <button
+                                            onClick={() => setActiveView("Active Jobs")}
+                                            className="px-6 py-3 rounded-xl text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl"
+                                        >
+                                            Create Your First Job →
+                                        </button>
+                                    </motion.div>
+                                ) : (
+                                    <>
                                 <StatsOverview
                                     stats={stats}
                                     icons={{ ScanText, CheckCircle2, XCircle, Sparkles }}
@@ -478,6 +515,8 @@ export default function Dashboard() {
                                         onDeleteScan={handleDeleteScan}
                                     />
                                 </div>
+                                    </>
+                                )}
                             </motion.div>
                         ) : (
                             <AllScansView
