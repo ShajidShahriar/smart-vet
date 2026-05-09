@@ -35,7 +35,7 @@ interface SidebarProps {
     setShowAllScans: (show: boolean) => void;
     mobileMenuOpen: boolean;
     setMobileMenuOpen: (open: boolean) => void;
-    user: { name: string; role: string };
+    user: { name: string; role: string; image?: string };
     badges?: {
         dashboard?: number;
         activeJobs?: number;
@@ -106,8 +106,12 @@ export default function Sidebar({
 
                 <div className="px-4 py-4 border-t border-white/[0.06]">
                     <div className="flex items-center gap-3 px-2">
-                        <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
-                            {user.name.charAt(0)}
+                        <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+                            {user.image ? (
+                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                user.name.charAt(0)
+                            )}
                         </div>
                         <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-white truncate">{user.name}</p>
@@ -189,8 +193,12 @@ export default function Sidebar({
 
                             <div className="px-6 py-4 border-t border-white/[0.06]">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white">
-                                        {user.name.charAt(0)}
+                                    <div className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+                                        {user.image ? (
+                                            <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            user.name.charAt(0)
+                                        )}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className="text-xs font-semibold text-white truncate">{user.name}</p>

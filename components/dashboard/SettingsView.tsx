@@ -30,7 +30,7 @@ const sectionVariants = {
 };
 
 // wraps each settings section with icon + title + drop animation
-function Section({ index, icon: Icon, title, children }: { index: number; icon: React.ElementType; title: string; children: React.ReactNode }) {
+function Section({ index, icon: Icon, title, badge, children }: { index: number; icon: React.ElementType; title: string; badge?: string; children: React.ReactNode }) {
     return (
         <motion.div
             custom={index}
@@ -44,6 +44,11 @@ function Section({ index, icon: Icon, title, children }: { index: number; icon: 
                     <Icon className="w-4 h-4 text-[var(--accent)]" />
                 </div>
                 <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">{title}</h2>
+                {badge && (
+                    <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50">
+                        {badge}
+                    </span>
+                )}
             </div>
             {children}
         </motion.div>
@@ -57,7 +62,7 @@ export default function SettingsView() {
             <Section index={0} icon={User} title="Profile & Account">
                 <ProfileContent />
             </Section>
-            <Section index={1} icon={CreditCard} title="Subscription & Usage">
+            <Section index={1} icon={CreditCard} title="Subscription & Usage" badge="Coming Soon">
                 <SubscriptionContent />
             </Section>
             <Section index={2} icon={Cpu} title="API & AI Engine">
@@ -263,7 +268,7 @@ function SubscriptionContent() {
                 <div className="w-full bg-[var(--body-bg)] h-2.5 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full transition-all duration-500 ${pct > 80 ? "bg-[var(--danger)]" : pct > 50 ? "bg-amber-500" : "bg-[var(--accent)]"}`} style={{ width: `${pct}%` }} />
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets March 1, 2026.</p>
+                <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets monthly.</p>
             </div>
 
 

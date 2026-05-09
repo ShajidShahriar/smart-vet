@@ -9,14 +9,11 @@ import {
     Sparkles,
     Menu,
     ScanText,
-    Search,
     Moon,
     Sun,
-    Bell,
     Settings,
-    type LucideIcon,
 } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import pdfToText from "react-pdftotext";
 import JobsDashboard from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
@@ -31,25 +28,18 @@ import ProfileModal from "./dashboard/ProfileModal";
 import ScanningOverlay from "./ScanningOverlay";
 import { Job, Scan } from "../types";
 
-// static data. all of this gets replaced once the api exists
-const DUMMY_USER = {
-    name: "Shajid Shahriar",
-    role: "Hiring Manager",
-    creditsUsed: 7,
-    creditsTotal: 10,
-};
-
-const DUMMY_STATS = {
-    totalScans: { value: "1,247", change: "+2.3%", up: true },
-    shortlisted: { value: "976", change: "+6.3%", up: true },
-    rejected: { value: "271", change: "-8.1%", up: false },
-    credits: { value: `${10 - 7}/${10}`, change: "Remaining", up: true },
-};
-
 
 
 
 export default function Dashboard() {
+    const { data: session } = useSession();
+
+    // derive user info from the real session, with safe fallbacks
+    const user = {
+        name: session?.user?.name || "User",
+        role: "Hiring Manager", // TODO: pull from user profile once wired
+        image: session?.user?.image || undefined,
+    };
     const [file, setFile] = useState<File | null>(null);
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [editingJob, setEditingJob] = useState<Job | null>(null);
@@ -252,7 +242,7 @@ export default function Dashboard() {
             totalScans: { value: total.toLocaleString(), change: "", up: true },
             shortlisted: { value: shortlisted.toLocaleString(), change: "", up: true },
             rejected: { value: rejected.toLocaleString(), change: "", up: false },
-            credits: DUMMY_STATS.credits, // keep dummy for now per request
+            credits: { value: "—", change: "Coming Soon", up: true },
         };
     }, [scans]);
 
@@ -265,7 +255,7 @@ export default function Dashboard() {
                 setShowAllScans={setShowAllScans}
                 mobileMenuOpen={mobileMenuOpen}
                 setMobileMenuOpen={setMobileMenuOpen}
-                user={DUMMY_USER}
+                user={user}
                 badges={{
                     dashboard: scans.filter(s => s.status === "Pending").length,
                     activeJobs: jobs.filter(j => j.status === "Active").length
@@ -315,7 +305,11 @@ export default function Dashboard() {
                             onClick={() => setShowProfileModal(true)}
                             className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white ml-1 cursor-pointer overflow-hidden border border-transparent hover:border-[var(--accent)] transition-colors"
                         >
-                            {DUMMY_USER.name.charAt(0)}
+                            {user.image ? (
+                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                            ) : (
+                                user.name.charAt(0)
+                            )}
                         </motion.button>
                     </div>
                 </header>
@@ -570,7 +564,7 @@ export default function Dashboard() {
                     <ProfileModal
                         isOpen={showProfileModal}
                         onClose={() => setShowProfileModal(false)}
-                        user={DUMMY_USER}
+                        user={user}
                         onSignOut={() => signOut()}
                         onEditProfile={() => {
                             setShowProfileModal(false);
