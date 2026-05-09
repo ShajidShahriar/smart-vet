@@ -419,30 +419,6 @@ export default function Dashboard() {
                                 className="space-y-6"
                             >
 
-                                {jobs.length === 0 && scans.length === 0 ? (
-                                    /* empty state for brand-new users */
-                                    <motion.div
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: 0.1 }}
-                                        className="flex flex-col items-center justify-center py-20 text-center"
-                                    >
-                                        <div className="w-20 h-20 rounded-2xl bg-[var(--accent-light)] flex items-center justify-center mb-6">
-                                            <Sparkles className="w-10 h-10 text-[var(--accent)]" />
-                                        </div>
-                                        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Welcome to Smart-Vet</h2>
-                                        <p className="text-[var(--text-secondary)] text-sm max-w-md mb-8 leading-relaxed">
-                                            Start by creating a job posting. Once you have a role, you can upload resumes and let AI score candidates against your requirements.
-                                        </p>
-                                        <button
-                                            onClick={() => setActiveView("Active Jobs")}
-                                            className="px-6 py-3 rounded-xl text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity shadow-lg hover:shadow-xl"
-                                        >
-                                            Create Your First Job →
-                                        </button>
-                                    </motion.div>
-                                ) : (
-                                    <>
                                 <StatsOverview
                                     stats={stats}
                                     icons={{ ScanText, CheckCircle2, XCircle, Sparkles }}
@@ -454,6 +430,24 @@ export default function Dashboard() {
                                     <div className="xl:col-span-2 bg-[var(--card-bg)] rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 flex flex-col">
                                         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Upload Resume</h3>
 
+                                        {jobs.length === 0 ? (
+                                            /* Inline prompt when no jobs exist yet */
+                                            <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
+                                                <div className="w-12 h-12 rounded-xl bg-[var(--accent-light)] flex items-center justify-center mb-4">
+                                                    <Sparkles className="w-6 h-6 text-[var(--accent)]" />
+                                                </div>
+                                                <p className="text-sm text-[var(--text-secondary)] mb-4 max-w-xs leading-relaxed">
+                                                    Create a job posting first, then upload resumes to score candidates against it.
+                                                </p>
+                                                <button
+                                                    onClick={() => setActiveView("Active Jobs")}
+                                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+                                                >
+                                                    Create Your First Job →
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <>
                                         {/* validates that a role is picked before allowing upload */}
                                         <div className="relative mb-4">
                                             <select
@@ -524,6 +518,8 @@ export default function Dashboard() {
                                                 {uploading ? "Analyzing…" : `Analyze ${file.name}`}
                                             </button>
                                         )}
+                                            </>
+                                        )}
                                     </div>
 
                                     <RecentScans
@@ -536,8 +532,6 @@ export default function Dashboard() {
                                         onDeleteScan={handleDeleteScan}
                                     />
                                 </div>
-                                    </>
-                                )}
                             </motion.div>
                         ) : (
                             <AllScansView
