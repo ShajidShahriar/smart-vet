@@ -77,3 +77,8 @@ body {
   background: #d1d5db;
   border-radius: 3px;
 }
+
+html.dark ::-webkit-scrollbar-thumb,
+:root[class~="dark"] ::-webkit-scrollbar-thumb {
+  background: #404040;
+}

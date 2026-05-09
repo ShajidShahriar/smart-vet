@@ -10,8 +10,8 @@ const UserSchema = new Schema({
 
     // ai engine config (set from settings page)
     apiKey: { type: String, default: "" },
-    model: { type: String, default: "gemini-2.0-flash" },
-    strictness: { type: Number, default: 2, min: 1, max: 4 },
+    model: { type: String, default: "gemini-2.5-flash" },
+    strictness: { type: Number, default: 50, min: 0, max: 100 },
 
     // preferences
     theme: { type: String, enum: ["light", "dark", "system"], default: "light" },

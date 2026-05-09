@@ -16,20 +16,6 @@ interface RecentScansProps {
     onDeleteScan: (e: React.MouseEvent, id: string) => void;
 }
 
-function TableHeader() {
-    return (
-        <thead>
-            <tr className="border-b border-gray-100">
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">File Name</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Category</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Date</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pr-4">Score</th>
-                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3">Status</th>
-            </tr>
-        </thead>
-    );
-}
-
 export default function RecentScans({ scans, onViewAll, onSelectScan, onDeleteScan }: RecentScansProps) {
     return (
         // layoutId="scans-card" powers the expand transition

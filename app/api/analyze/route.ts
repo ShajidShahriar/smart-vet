@@ -6,6 +6,17 @@ import { analyzeResume } from "@/lib/gemini";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 
+// shape returned by Job.findOne().lean() — plain object, no Mongoose wrappers
+interface LeanJob {
+  _id: string;
+  title: string;
+  department: string;
+  description: string;
+  status: string;
+  skills: string[];
+  userId: string;
+}
+
 export async function POST(req: Request) {
   try {
     const session = await auth();
@@ -32,12 +43,11 @@ export async function POST(req: Request) {
     const blob = await put(file.name, file, {
       access: 'public',
       addRandomSuffix: true,
-
     });
 
     // find the job so we can use its description in the prompt
     // ALSO ensure the job belongs to this user to prevent scanning against other people's jobs
-    const job = await Job.findOne({ title: jobTitle, userId: session.user.id }).lean();
+    const job = await Job.findOne({ title: jobTitle, userId: session.user.id }).lean<LeanJob>();
     if (!job) {
       return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
     }
@@ -48,7 +58,7 @@ export async function POST(req: Request) {
 
     const result = await analyzeResume(
       text,
-      (job as Record<string, unknown>).description as string || "",
+      job.description || "",
       jobTitle,
       strictness,
       apiKey
@@ -56,13 +66,13 @@ export async function POST(req: Request) {
 
     // persist the scan result
     const scan = await Scan.create({
-      jobId: (job as Record<string, unknown>)._id,
+      jobId: job._id,
       userId: session.user.id,
-      filename: file.name, // save the actual filename
-      fileUrl: blob.url, // save the blob url
+      filename: file.name,
+      fileUrl: blob.url,
       candidateName: result.candidateName,
       score: result.score,
-      status: "Pending", // initial status is pending review
+      status: "Pending",
       summary: result.summary,
       category: jobTitle,
     });

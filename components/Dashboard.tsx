@@ -88,7 +88,7 @@ export default function Dashboard() {
             await Promise.all([
                 fetchJobs(),
                 fetchScans(),
-                new Promise((resolve) => setTimeout(resolve, 2000)) // Force 2s animation
+                new Promise((resolve) => setTimeout(resolve, 400)) // brief animation buffer
             ]);
             setIsLoading(false);
         };
@@ -174,10 +174,10 @@ export default function Dashboard() {
                 fetchJobs(); // refresh job cards for candidate count
                 setFile(null); // clear file input
             } else {
-                alert("Error: " + result.error);
+                showToast("Error: " + result.error);
             }
         } catch (error) {
-            alert("Something went wrong!");
+            showToast("Something went wrong!");
             console.error(error);
         } finally {
             setUploading(false);
