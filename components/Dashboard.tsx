@@ -194,10 +194,9 @@ export default function Dashboard() {
             await fetchScans(); // refresh list
             fetchJobs(); // refresh job cards for shortlisted count
 
-            // update local modal state too so it reflects immediately if we keep it open
+            // update local modal state so it reflects immediately
             if (selectedScan && selectedScan._id === id) {
-                // @ts-ignore
-                setSelectedScan({ ...selectedScan, status: newStatus });
+                setSelectedScan({ ...selectedScan, status: newStatus } as Scan);
             }
             setShowScanModal(false); // close on action per plan
         } catch (err) {

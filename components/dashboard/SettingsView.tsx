@@ -89,7 +89,7 @@ function ProfileContent() {
         if (session?.user) {
             setFullName(session.user.name || "");
             setEmail(session.user.email || "");
-            setJobTitle((session.user as any).jobTitle || "Hiring Manager"); // type assertion until we extend types
+            setJobTitle((session.user as Record<string, string>).jobTitle || "Hiring Manager");
             setAvatarPreview(session.user.image || null);
         }
     }, [session]);

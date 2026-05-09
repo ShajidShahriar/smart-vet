@@ -101,7 +101,7 @@ export default function JobDetailView({ job, candidates, onBack, onEdit, onSelec
                         </div>
                         <div className="flex items-center gap-4 mt-1 text-sm text-[var(--text-secondary)]">
                             <span className="flex items-center gap-1.5"><MapPin size={14} /> {job.department}</span>
-                            <span className="flex items-center gap-1.5"><Calendar size={14} /> Posted on {new Date((job as any).createdAt).toLocaleDateString()}</span>
+                            <span className="flex items-center gap-1.5"><Calendar size={14} /> Posted on {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : "N/A"}</span>
                         </div>
                     </div>
                 </div>

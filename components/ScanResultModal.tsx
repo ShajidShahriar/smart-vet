@@ -9,6 +9,7 @@ interface ScanResultModalProps {
     scan: {
         _id: string;
         filename: string;
+        fileUrl?: string;
         candidateName: string;
         score: number;
         status: "Pass" | "Fail" | "Pending" | "Accepted" | "Rejected";
@@ -106,7 +107,7 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                                     <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--card-border)]">
                                         <FileText className="w-4 h-4" />
                                         <a
-                                            href={(scan as any).fileUrl || `/uploads/${scan.filename}`}
+                                            href={scan.fileUrl || "#"}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-[var(--accent)] hover:underline transition-colors cursor-pointer"

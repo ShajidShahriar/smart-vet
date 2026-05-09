@@ -14,6 +14,7 @@ export interface Scan {
     _id: string;
     jobId: string;
     filename: string;
+    fileUrl?: string;
     candidateName: string;
     score: number;
     status: "Pending" | "Accepted" | "Rejected" | "Pass" | "Fail";
