@@ -5,6 +5,7 @@ import Scan from "@/lib/models/Scan";
 import { analyzeResume } from "@/lib/gemini";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
+import crypto from "crypto";
 
 // shape returned by Job.findOne().lean() — plain object, no Mongoose wrappers
 interface LeanJob {
@@ -74,15 +75,37 @@ export async function POST(req: Request) {
     const apiKey = req.headers.get("x-gemini-api-key") || undefined;
     const strictness = parseInt(req.headers.get("x-gemini-strictness") || "50");
 
-    const result = await analyzeResume(
-      text,
-      job.description || "",
-      jobTitle,
-      strictness,
-      apiKey
-    );
+    // Generate a deterministic hash of all inputs that affect the AI output
+    const promptHash = crypto
+      .createHash("sha256")
+      .update(text + (job.description || "") + strictness)
+      .digest("hex");
 
-    // persist the scan result
+    // Check if we already analyzed this exact resume for this exact job config
+    const cachedScan = await Scan.findOne({ promptHash, userId: session.user.id }).lean();
+
+    let result;
+    if (cachedScan) {
+      console.log(`[Cache Hit] Skipping Gemini API for hash: ${promptHash}`);
+      // Re-use the AI results from the cached scan
+      result = {
+        candidateName: cachedScan.candidateName,
+        score: cachedScan.score,
+        summary: cachedScan.summary,
+        breakdown: cachedScan.breakdown,
+      };
+    } else {
+      console.log(`[Cache Miss] Calling Gemini API for hash: ${promptHash}`);
+      result = await analyzeResume(
+        text,
+        job.description || "",
+        jobTitle,
+        strictness,
+        apiKey
+      );
+    }
+
+    // persist the scan result (creates a NEW record so user sees it, but may use cached AI data)
     const scan = await Scan.create({
       jobId: job._id,
       userId: session.user.id,
@@ -92,7 +115,9 @@ export async function POST(req: Request) {
       score: result.score,
       status: "Pending",
       summary: result.summary,
+      breakdown: result.breakdown,
       category: jobTitle,
+      promptHash, // Save the hash so future uploads hit the cache
     });
 
     return NextResponse.json({
@@ -105,6 +130,7 @@ export async function POST(req: Request) {
         score: result.score,
         status: scan.status,
         summary: result.summary,
+        breakdown: result.breakdown,
         category: jobTitle,
       },
     });

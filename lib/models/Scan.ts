@@ -11,7 +11,14 @@ const ScanSchema = new Schema({
     score: { type: Number, required: true },
     status: { type: String, enum: ["Pending", "Accepted", "Rejected", "Pass", "Fail"], default: "Pending" },
     summary: { type: String },
+    breakdown: {
+        skillsMatch: { score: Number, max: Number, comment: String },
+        experience: { score: Number, max: Number, comment: String },
+        projectsLinks: { score: Number, max: Number, comment: String },
+        security: { flagged: Boolean, comment: String },
+    },
     category: { type: String, default: "" },
+    promptHash: { type: String, index: true },
 }, {
     timestamps: true,
 });

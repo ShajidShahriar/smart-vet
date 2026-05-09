@@ -45,7 +45,7 @@ function Section({ index, icon: Icon, title, badge, children }: { index: number;
                 </div>
                 <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">{title}</h2>
                 {badge && (
-                    <span className="ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800/50">
+                    <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[var(--card-border)] text-[var(--text-secondary)]">
                         {badge}
                     </span>
                 )}
@@ -224,8 +224,8 @@ function ProfileContent() {
                     <p className="text-sm font-semibold text-[var(--danger)]">Danger Zone</p>
                     <p className="text-xs text-[var(--text-secondary)] mt-0.5">Permanently delete your account. This cannot be undone.</p>
                 </div>
-                <button className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[var(--danger-light)] text-[var(--danger)] border border-[var(--danger)]/20 hover:bg-[var(--danger)] hover:text-white transition-all shrink-0">
-                    <Trash2 className="w-4 h-4" /> Delete Account
+                <button disabled className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[var(--danger-light)] text-[var(--danger)] border border-[var(--danger)]/20 opacity-60 cursor-not-allowed shrink-0">
+                    <Trash2 className="w-4 h-4" /> Delete Account (Soon)
                 </button>
             </div>
         </div>
@@ -402,28 +402,31 @@ function PreferencesContent() {
 
 
             <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Notifications</h3>
+                <div className="flex items-center gap-3 mb-0.5">
+                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Notifications</h3>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[var(--card-border)] text-[var(--text-secondary)]">COMING SOON</span>
+                </div>
                 <p className="text-xs text-[var(--text-secondary)] mb-4">Control which events trigger notifications.</p>
-                <div className="space-y-4">
-                    <CheckboxRow checked={notifHighScore} onChange={setNotifHighScore} label="High score alert" desc="Email when a resume scores 90%+" />
-                    <CheckboxRow checked={notifLowCredits} onChange={setNotifLowCredits} label="Low credits warning" desc="Notify when API credits drop below 20%" />
-                    <CheckboxRow checked={notifWeeklySummary} onChange={setNotifWeeklySummary} label="Weekly digest" desc="Receive a summary of all scans each Monday" />
+                <div className="space-y-4 opacity-60 pointer-events-none">
+                    <CheckboxRow checked={notifHighScore} onChange={setNotifHighScore} disabled={true} label="High score alert" desc="Email when a resume scores 90%+" />
+                    <CheckboxRow checked={notifLowCredits} onChange={setNotifLowCredits} disabled={true} label="Low credits warning" desc="Notify when API credits drop below 20%" />
+                    <CheckboxRow checked={notifWeeklySummary} onChange={setNotifWeeklySummary} disabled={true} label="Weekly digest" desc="Receive a summary of all scans each Monday" />
                 </div>
             </div>
 
             <div className="flex justify-end">
-                <button className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity">Save Preferences</button>
+                <button disabled className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--card-border)] text-[var(--text-secondary)] cursor-not-allowed">Save Preferences</button>
             </div>
         </div>
     );
 }
 
 
-function CheckboxRow({ checked, onChange, label, desc }: { checked: boolean; onChange: (v: boolean) => void; label: string; desc: string }) {
+function CheckboxRow({ checked, onChange, label, desc, disabled = false }: { checked: boolean; onChange: (v: boolean) => void; label: string; desc: string; disabled?: boolean }) {
     return (
-        <label className="flex items-start gap-3 cursor-pointer group" onClick={() => onChange(!checked)}>
+        <label className={`flex items-start gap-3 ${disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer group"}`} onClick={(e) => { if (disabled) e.preventDefault(); else onChange(!checked); }}>
             <div className="pt-0.5">
-                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-[var(--accent)] border-[var(--accent)]" : "border-[var(--card-border)] group-hover:border-[var(--accent)]/50"}`}>
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-[var(--accent)] border-[var(--accent)]" : "border-[var(--card-border)]"} ${!disabled && !checked && "group-hover:border-[var(--accent)]/50"}`}>
                     {checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </div>
             </div>

@@ -180,8 +180,8 @@ export default function Dashboard() {
             const response = await fetch("/api/analyze", {
                 method: "POST",
                 headers: {
-                    ...(config.apiKey && { "x-gemini-api-key": config.apiKey }),
-                    ...(config.strictness && { "x-gemini-strictness": config.strictness.toString() }),
+                    ...(config.apiKey ? { "x-gemini-api-key": config.apiKey } : {}),
+                    ...(config.strictness !== undefined ? { "x-gemini-strictness": config.strictness.toString() } : {}),
                 },
                 body: formData, // fetch automatically sets Content-Type to multipart/form-data
             });
@@ -561,7 +561,7 @@ export default function Dashboard() {
                             <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Privacy</a>
                             <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Terms</a>
                             <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Support</a>
-                            <span className="text-[var(--text-secondary)]/50">v0.1.0</span>
+                            <span className="text-[var(--text-secondary)]/50">v0.1.1</span>
                         </div>
                     </div>
                 </footer>

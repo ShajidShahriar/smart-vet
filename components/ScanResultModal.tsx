@@ -2,20 +2,12 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, XCircle, FileText, CheckCircle2 } from "lucide-react";
+import { Scan } from "../types";
 
 interface ScanResultModalProps {
     isOpen: boolean;
     onClose: () => void;
-    scan: {
-        _id: string;
-        filename: string;
-        fileUrl?: string;
-        candidateName: string;
-        score: number;
-        status: "Pass" | "Fail" | "Pending" | "Accepted" | "Rejected";
-        summary: string;
-        category: string;
-    } | null;
+    scan: Scan | null;
     onUpdateStatus: (id: string, newStatus: "Pass" | "Fail" | "Accepted" | "Rejected") => void;
 }
 
@@ -103,6 +95,47 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                                             {scan.summary || "No summary available."}
                                         </p>
                                     </div>
+
+                                    {scan.breakdown?.security?.flagged && (
+                                        <div className="bg-rose-500/10 border border-rose-500/20 p-4 rounded-lg">
+                                            <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2 mb-1">
+                                                <XCircle className="w-4 h-4" />
+                                                Security Alert: Prompt Injection Detected
+                                            </h4>
+                                            <p className="text-xs text-rose-600/80 dark:text-rose-400/80 leading-relaxed">
+                                                {scan.breakdown.security.comment}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {scan.breakdown && (
+                                        <div>
+                                            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-3">Score Breakdown</h3>
+                                            <div className="space-y-4">
+                                                {[
+                                                    { label: "Skills & Relevance", data: scan.breakdown.skillsMatch },
+                                                    { label: "Experience & Impact", data: scan.breakdown.experience },
+                                                    { label: "Projects & Links", data: scan.breakdown.projectsLinks }
+                                                ].map((category, i) => category.data && (
+                                                    <div key={i} className="bg-[var(--body-bg)] p-4 rounded-lg border border-[var(--card-border)]">
+                                                        <div className="flex justify-between items-center mb-2">
+                                                            <span className="text-sm font-semibold text-[var(--text-primary)]">{category.label}</span>
+                                                            <span className="text-xs font-bold text-[var(--accent)]">{category.data.score} / {category.data.max}</span>
+                                                        </div>
+                                                        <div className="w-full h-1.5 bg-[var(--card-border)] rounded-full mb-3 overflow-hidden">
+                                                            <div 
+                                                                className="h-full bg-[var(--accent)] rounded-full" 
+                                                                style={{ width: `${(category.data.score / category.data.max) * 100}%` }}
+                                                            />
+                                                        </div>
+                                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                                                            {category.data.comment}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
                                     <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--card-border)]">
                                         <FileText className="w-4 h-4" />
