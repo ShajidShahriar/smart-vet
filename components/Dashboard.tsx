@@ -100,6 +100,10 @@ export default function Dashboard() {
         setTimeout(() => setToast((prev) => ({ ...prev, visible: false })), 3000);
     }, []);
 
+    // upload limits
+    const MAX_FILE_SIZE_MB = 5;
+    const MAX_TEXT_LENGTH = 50_000; // ~20 pages of text
+
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!selectedJobRole) {
             showToast("Please select a job category first.");
@@ -107,7 +111,13 @@ export default function Dashboard() {
             return;
         }
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
+            const selected = e.target.files[0];
+            if (selected.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                showToast(`File too large. Max ${MAX_FILE_SIZE_MB}MB allowed.`);
+                e.target.value = "";
+                return;
+            }
+            setFile(selected);
         }
     };
 
@@ -120,6 +130,10 @@ export default function Dashboard() {
         }
         const droppedFile = e.dataTransfer.files?.[0];
         if (droppedFile && droppedFile.type === "application/pdf") {
+            if (droppedFile.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+                showToast(`File too large. Max ${MAX_FILE_SIZE_MB}MB allowed.`);
+                return;
+            }
             setFile(droppedFile);
         }
     }, [selectedJobRole, showToast]);
@@ -145,6 +159,13 @@ export default function Dashboard() {
         setUploading(true);
         try {
             const text = await pdfToText(file);
+
+            // guard: reject excessively long resumes (likely multi-hundred pages)
+            if (text.length > MAX_TEXT_LENGTH) {
+                showToast(`Resume too long (~${Math.round(text.length / 2500)} pages). Max ~20 pages.`);
+                setUploading(false);
+                return;
+            }
 
             // use FormData to send file + text
             const formData = new FormData();

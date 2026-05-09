@@ -39,6 +39,24 @@ export async function POST(req: Request) {
       );
     }
 
+    // server-side limits (defense in depth — client also validates)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    const MAX_TEXT_LENGTH = 50_000; // ~20 pages
+
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit` },
+        { status: 413 }
+      );
+    }
+
+    if (text.length > MAX_TEXT_LENGTH) {
+      return NextResponse.json(
+        { error: "Resume text too long. Max ~20 pages supported." },
+        { status: 413 }
+      );
+    }
+
     // Upload to Vercel Blob
     const blob = await put(file.name, file, {
       access: 'public',
