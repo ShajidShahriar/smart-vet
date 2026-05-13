@@ -8,40 +8,38 @@
 
 ## About The Project
 
-Smart-Vet is an intelligent career tool designed to bridge the gap between job seekers and applicant tracking systems (ATS). By leveraging Google's **Gemini AI**, it analyzes resumes against specific job descriptions to provide actionable feedback, match scoring, and optimization suggestions.
+Smart-Vet is a full-stack AI hiring platform built to evaluate resumes against job descriptions with configurable precision. Moving beyond a standard API wrapper, Smart-Vet features a robust backend architecture that prioritizes data security, LLM cost efficiency, and granular AI control. It empowers users to understand application gaps while maintaining complete control over their API usage and data privacy.
 
-The goal is simple : help candidates understand exactly why they might be getting rejected and how to fix it in seconds.
+## Key Engineering Features
 
-## Key Features
-
-* **AI-Driven Analysis** : Utilizes the Gemini API to deeply understand context, skills, and nuances in both the CV and Job Description.
-* **Match Scoring** : Provides a quantified "Match Percentage" to gauge application strength instantly.
-* **Gap Identification** : Highlights missing keywords and skills that the employer is specifically looking for.
-* **Actionable Feedback** : Offers concrete, tailored advice on how to rephrase bullet points and summaries for better impact.
-* **Secure & Fast** : Built with Next.js for server-side rendering performance and secure API handling.
+* **Configurable Evaluation Engine** : Features a strictness slider in the UI that directly maps to the Gemini API's temperature parameter. This shifts the AI's scoring behavior from lenient to highly critical at request time, without requiring complex prompt rewrites.
+* **Bring Your Own Key (BYOK)** : Implemented secure BYOK support via custom request headers. Users inject their own Gemini API key at runtime, granting them full control over their own usage limits and preventing shared-key throttling.
+* **Zero-Latency Caching Layer** : Engineered a custom caching system using SHA-256 hashes of the combined resume, job description, and strictness inputs. Repeat analyses bypass the LLM entirely, reducing response latency from 5-8 seconds to near zero and eliminating redundant token costs.
+* **Secure Auth & Data Isolation** : Integrated NextAuth.js for seamless Google OAuth. The backend enforces strict, session-scoped data isolation across all API routes, ensuring users can only ever access their own data.
 
 ## Tech Stack
 
 **Frontend**
-* Next.js
-* React.js
-* Tailwind CSS
-* Framer Motion (Animations)
+* Next.js, React.js
+* Tailwind CSS, Framer Motion
 
-**Backend & AI**
-* Node.js (Server Actions)
+**Backend & Architecture**
+* Node.js
+* MongoDB, Mongoose
+* NextAuth.js (Google OAuth)
+* SHA-256 Hashing (Caching Layer)
+
+**AI Integration**
 * Google Gemini API (Generative AI)
-* MongoDB (User Data & History)
 
 ## How to Use
 
-Since this is a web-based application, no installation is required. You can access the tool directly via the [Live Demo](https://smart-vet-weld.vercel.app).
+You can access the tool directly via the [Live Demo](https://smart-vet-weld.vercel.app).
 
-1.  **Input Job Details** : Paste the Job Description (JD) into the designated text area.
-2.  **Upload Resume** : Upload your Resume (PDF) or paste the text content.
-3.  **Analyze** : Click the analysis button to trigger the Gemini AI agent.
-4.  **Review** : Receive your match score, missing keywords, and specific improvement suggestions.
-
+1.  **Authenticate** : Log in securely using Google OAuth to establish your isolated session.
+2.  **Configure API & Strictness** : Provide your personal Gemini API key and set the strictness slider to determine how critically the AI should evaluate the resume.
+3.  **Input Data** : Paste the target Job Description and upload your Resume text.
+4.  **Analyze** : Trigger the evaluation. Identical subsequent requests will return instantly via the caching layer.
 
 ## Contact
 
