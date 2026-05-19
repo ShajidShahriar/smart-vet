@@ -29,3 +29,24 @@ export interface Scan {
     promptHash?: string;
     createdAt: string;
 }
+
+export interface User {
+    _id: string;
+    name: string;
+    email: string;
+    emailVerified?: Date | null;
+    image?: string;
+    jobTitle?: string;
+    avatarUrl?: string;
+    apiKey?: string;
+    model?: string;
+    strictness?: number;
+    theme?: "light" | "dark" | "system";
+    notifHighScore?: boolean;
+    notifLowCredits?: boolean;
+    notifWeeklyDigest?: boolean;
+    creditsUsed?: number;
+    creditsTotal?: number;
+    createdAt?: string;
+    updatedAt?: string;
+}

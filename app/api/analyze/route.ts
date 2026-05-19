@@ -6,6 +6,8 @@ import { analyzeResume } from "@/lib/gemini";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import crypto from "crypto";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const pdfParse = require("pdf-parse");
 
 // shape returned by Job.findOne().lean() — plain object, no Mongoose wrappers
 interface LeanJob {
@@ -30,17 +32,16 @@ export async function POST(req: Request) {
     // handle form data for file upload
     const formData = await req.formData();
     const file = formData.get("file") as File;
-    const text = formData.get("text") as string;
     const jobTitle = formData.get("jobTitle") as string;
 
-    if (!file || !text || !jobTitle) {
+    if (!file || !jobTitle) {
       return NextResponse.json(
-        { error: "file, resume text and job title are all required" },
+        { error: "file and job title are required" },
         { status: 400 }
       );
     }
 
-    // server-side limits (defense in depth — client also validates)
+    // server-side limits
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
     const MAX_TEXT_LENGTH = 50_000; // ~20 pages
 
@@ -48,6 +49,18 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: `File exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit` },
         { status: 413 }
+      );
+    }
+
+    // extract text from PDF on the server — never trust client-submitted text
+    const fileBuffer = Buffer.from(await file.arrayBuffer());
+    const pdfData = await pdfParse(fileBuffer);
+    const text = pdfData.text;
+
+    if (!text || text.trim().length === 0) {
+      return NextResponse.json(
+        { error: "Could not extract text from PDF. The file may be scanned/image-based." },
+        { status: 422 }
       );
     }
 

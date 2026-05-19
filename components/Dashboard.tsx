@@ -14,7 +14,6 @@ import {
     Settings,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import pdfToText from "react-pdftotext";
 import JobsDashboard from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
@@ -102,7 +101,6 @@ export default function Dashboard() {
 
     // upload limits
     const MAX_FILE_SIZE_MB = 5;
-    const MAX_TEXT_LENGTH = 50_000; // ~20 pages of text
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!selectedJobRole) {
@@ -158,19 +156,9 @@ export default function Dashboard() {
 
         setUploading(true);
         try {
-            const text = await pdfToText(file);
-
-            // guard: reject excessively long resumes (likely multi-hundred pages)
-            if (text.length > MAX_TEXT_LENGTH) {
-                showToast(`Resume too long (~${Math.round(text.length / 2500)} pages). Max ~20 pages.`);
-                setUploading(false);
-                return;
-            }
-
-            // use FormData to send file + text
+            // send only the raw PDF — server extracts text (never trust client-parsed text)
             const formData = new FormData();
             formData.append("file", file);
-            formData.append("text", text);
             formData.append("jobTitle", selectedJobRole);
 
             // retrieve user config (BYOK)
@@ -183,7 +171,7 @@ export default function Dashboard() {
                     ...(config.apiKey ? { "x-gemini-api-key": config.apiKey } : {}),
                     ...(config.strictness !== undefined ? { "x-gemini-strictness": config.strictness.toString() } : {}),
                 },
-                body: formData, // fetch automatically sets Content-Type to multipart/form-data
+                body: formData,
             });
 
             const result = await response.json();
