@@ -5,11 +5,11 @@ import { type LucideIcon } from "lucide-react";
 
 // fadeUp variant logic
 const fadeUp = {
-    hidden: { opacity: 0, y: 16 },
+    hidden: { opacity: 0, y: -30 },
     visible: (i: number) => ({
         opacity: 1,
         y: 0,
-        transition: { delay: i * 0.06, duration: 0.35, ease: "easeOut" as const },
+        transition: { delay: i * 0.1, duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
     }),
 };
 
@@ -32,15 +32,13 @@ function StatCard({
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="flex rounded-lg overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.06)]"
+            className="rounded-lg border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] p-4 flex flex-col hover:border-gray-300 dark:hover:border-white/30 transition-colors"
         >
-            <div className={`${color} w-[72px] flex items-center justify-center shrink-0`}>
-                <Icon className="w-6 h-6 text-white" />
+            <div className="flex items-center gap-2 mb-2">
+                <Icon className={`w-4 h-4 ${color}`} />
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{label}</p>
             </div>
-            <div className="flex-1 bg-[var(--card-bg)] px-5 py-4">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-[var(--text-secondary)] mb-1">{label}</p>
-                <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-            </div>
+            <p className="text-2xl font-semibold text-gray-900 dark:text-white font-mono mt-1">{value}</p>
         </motion.div>
     );
 }
@@ -70,10 +68,10 @@ export default function StatsOverview({ stats, icons }: StatsOverviewProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
         >
-            <StatCard icon={ScanText} color="bg-[var(--sidebar-bg)]" label="Total Scans" value={stats.totalScans.value} index={0} />
-            <StatCard icon={CheckCircle2} color="bg-emerald-500" label="Shortlisted" value={stats.shortlisted.value} index={1} />
-            <StatCard icon={XCircle} color="bg-red-500" label="Rejected" value={stats.rejected.value} index={2} />
-            <StatCard icon={Sparkles} color="bg-blue-500" label="Credits" value={stats.credits.value} index={3} />
+            <StatCard icon={ScanText} color="text-gray-600 dark:text-gray-300" label="Total Scans" value={stats.totalScans.value} index={0} />
+            <StatCard icon={CheckCircle2} color="text-gray-600 dark:text-gray-300" label="Shortlisted" value={stats.shortlisted.value} index={1} />
+            <StatCard icon={XCircle} color="text-gray-600 dark:text-gray-300" label="Rejected" value={stats.rejected.value} index={2} />
+            <StatCard icon={Sparkles} color="text-gray-600 dark:text-gray-300" label="Credits" value={stats.credits.value} index={3} />
         </motion.div>
     );
 }

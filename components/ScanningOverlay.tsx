@@ -42,16 +42,16 @@ export default function ScanningOverlay({ isAnalyzing }: ScanningOverlayProps) {
                     className="fixed inset-0 z-50 pointer-events-auto cursor-wait"
                 >
                     {/* 1. Interaction Blocker Backdrop */}
-                    <div className="absolute inset-0 bg-[var(--overlay-bg)] backdrop-blur-[2px]" />
+                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
                     {/* 2. Ambient Border Effect */}
                     <div className="absolute inset-0 pointer-events-none overflow-hidden">
                         <motion.div
                             animate={{
                                 boxShadow: [
-                                    "inset 0 0 0px 0px rgba(99, 102, 241, 0)",
-                                    "inset 0 0 40px 10px rgba(99, 102, 241, 0.3)",
-                                    "inset 0 0 0px 0px rgba(99, 102, 241, 0)"
+                                    "inset 0 0 0px 0px rgba(128, 128, 128, 0)",
+                                    "inset 0 0 40px 10px rgba(128, 128, 128, 0.2)",
+                                    "inset 0 0 0px 0px rgba(128, 128, 128, 0)"
                                 ]
                             }}
                             transition={{
@@ -59,14 +59,14 @@ export default function ScanningOverlay({ isAnalyzing }: ScanningOverlayProps) {
                                 repeat: Infinity,
                                 ease: "easeInOut"
                             }}
-                            className="absolute inset-0 border-[6px] border-indigo-500/30 rounded-none z-50"
+                            className="absolute inset-0 border-[4px] border-gray-400/20 dark:border-gray-500/20 rounded-none z-50"
                         />
                     </div>
 
                     {/* 3. Central Analysis Hub */}
-                    <div className="absolute inset-x-0 top-0 h-1 bg-gray-100 z-50">
+                    <div className="absolute inset-x-0 top-0 h-1 bg-gray-200 dark:bg-white/10 z-50">
                         <motion.div
-                            className="h-full bg-blue-600 shadow-[0_0_10px_rgba(37,99,235,0.5)]"
+                            className="h-full bg-gray-900 dark:bg-white"
                             initial={{ width: "0%" }}
                             animate={{ width: `${progress}%` }}
                             transition={{ ease: "linear" }}

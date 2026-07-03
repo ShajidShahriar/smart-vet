@@ -38,48 +38,48 @@ export default function ProfileModal({
             {/* Modal */}
             <motion.div
                 layoutId="profile-modal"
-                className="fixed top-20 right-6 z-50 w-80 bg-[var(--card-bg)] rounded-2xl shadow-2xl border border-[var(--card-border)] overflow-hidden"
+                className="fixed top-20 right-6 z-50 w-80 bg-white dark:bg-[#0a0a0a] rounded-xl shadow-lg border border-gray-200 dark:border-white/10 overflow-hidden"
                 initial={{ opacity: 0, scale: 0.9, y: -20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: -20 }}
                 transition={{ type: "spring", damping: 25, stiffness: 300 }}
             >
-                <div className="p-6 text-center border-b border-[var(--card-border)] relative">
+                <div className="p-5 text-center border-b border-gray-200 dark:border-white/10 relative">
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                        className="absolute top-4 right-4 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
                     >
-                        <X className="w-5 h-5" />
+                        <X className="w-4 h-4" />
                     </button>
 
-                    <div className="w-20 h-20 mx-auto bg-[var(--accent)] rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3 shadow-lg shadow-[var(--accent)]/20">
+                    <div className="w-16 h-16 mx-auto bg-gray-900 dark:bg-white rounded-full flex items-center justify-center text-xl font-bold text-white dark:text-black mb-3 shadow-sm">
                         {user.image ? (
                             <img src={user.image} alt={user.name} className="w-full h-full rounded-full object-cover" />
                         ) : (
                             user.name.charAt(0)
                         )}
                     </div>
-                    <h3 className="text-lg font-bold text-[var(--text-primary)]">{user.name}</h3>
-                    <p className="text-sm text-[var(--text-secondary)]">{user.role}</p>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{user.name}</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{user.role}</p>
                 </div>
 
                 <div className="p-2">
                     <button
                         onClick={onEditProfile}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--body-bg)] rounded-xl transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-900 rounded-md transition-colors"
                     >
-                        <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center text-[var(--text-secondary)]">
-                            <Settings className="w-4 h-4" />
+                        <div className="w-7 h-7 rounded-md bg-gray-50 dark:bg-[#111] flex items-center justify-center text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-white/10">
+                            <Settings className="w-3.5 h-3.5" />
                         </div>
                         Edit Profile
                     </button>
 
                     <button
                         onClick={onSignOut}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger-light)]/10 rounded-xl transition-colors mt-1"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 rounded-md transition-colors mt-1"
                     >
-                        <div className="w-8 h-8 rounded-lg bg-[var(--danger-light)]/20 flex items-center justify-center text-[var(--danger)]">
-                            <LogOut className="w-4 h-4" />
+                        <div className="w-7 h-7 rounded-md bg-red-50 dark:bg-red-900/20 flex items-center justify-center text-red-500 border border-red-100 dark:border-red-900/30">
+                            <LogOut className="w-3.5 h-3.5" />
                         </div>
                         Sign Out
                     </button>

@@ -18,7 +18,7 @@ import JobsDashboard from "./JobsDashboard";
 import JobDetailView from "./JobDetailView";
 import AddJobModal from "./AddJobModal";
 import ScanResultModal from "./ScanResultModal";
-import Sidebar from "./dashboard/Sidebar";
+import Topbar from "./dashboard/Topbar";
 import StatsOverview from "./dashboard/StatsOverview";
 import RecentScans from "./dashboard/RecentScans";
 import AllScansView from "./dashboard/AllScansView";
@@ -255,9 +255,10 @@ export default function Dashboard() {
     }, [scans]);
 
     return (
-        <div className="flex min-h-screen bg-[var(--body-bg)]">
+        <div className="flex flex-col h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100">
             <ScanningOverlay isAnalyzing={uploading || isLoading} />
-            <Sidebar
+            
+            <Topbar
                 activeView={activeView}
                 setActiveView={setActiveView}
                 setShowAllScans={setShowAllScans}
@@ -268,71 +269,50 @@ export default function Dashboard() {
                     dashboard: scans.filter(s => s.status === "Pending").length,
                     activeJobs: jobs.filter(j => j.status === "Active").length
                 }}
-            />
+            >
+                <button
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors text-gray-500"
+                >
+                    {mounted && theme === "dark" ? (
+                        <Moon className="w-4 h-4" />
+                    ) : (
+                        <Sun className="w-4 h-4" />
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveView("Settings & API")}
+                    className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors text-gray-500 hidden sm:flex"
+                >
+                    <Settings className="w-4 h-4" />
+                </button>
+                <motion.button
+                    layoutId="profile-modal"
+                    onClick={() => setShowProfileModal(true)}
+                    className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-800 flex items-center justify-center text-sm font-bold text-gray-900 dark:text-white ml-2 cursor-pointer overflow-hidden border border-gray-200 dark:border-white/20 hover:border-gray-400 dark:hover:border-white/40 transition-colors shrink-0"
+                >
+                    {user.image ? (
+                        <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
+                    ) : (
+                        user.name.charAt(0)
+                    )}
+                </motion.button>
+            </Topbar>
 
             {/* main content */}
-
-
-            <div className="flex-1 lg:ml-60 flex flex-col">
-
-                <header className="sticky top-0 z-30 h-16 bg-[var(--card-bg)] border-b border-[var(--card-border)] flex items-center justify-between px-4 sm:px-6 gap-4">
-
-                    <div className="flex items-center gap-3">
-                        <button
-                            onClick={() => setMobileMenuOpen(true)}
-                            className="lg:hidden w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
-                        >
-                            <Menu className="w-5 h-5 text-[var(--text-secondary)]" />
-                        </button>
-                        <div className="flex items-center gap-2 px-4 py-2.5">
-                            <span className="text-xl font-bold text-[var(--text-primary)]">{activeView}</span>
-                        </div>
-                    </div>
-
-
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                            className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
-                        >
-                            {mounted && theme === "dark" ? (
-                                <Moon className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
-                            ) : (
-                                <Sun className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
-                            )}
-                        </button>
-                        {/* Notification bell removed per request */}
-                        <button
-                            onClick={() => setActiveView("Settings & API")}
-                            className="w-9 h-9 rounded-xl hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
-                        >
-                            <Settings className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
-                        </button>
-                        <motion.button
-                            layoutId="profile-modal"
-                            onClick={() => setShowProfileModal(true)}
-                            className="w-9 h-9 rounded-full bg-[var(--accent)] flex items-center justify-center text-sm font-bold text-white ml-1 cursor-pointer overflow-hidden border border-transparent hover:border-[var(--accent)] transition-colors"
-                        >
-                            {user.image ? (
-                                <img src={user.image} alt={user.name} className="w-full h-full object-cover" />
-                            ) : (
-                                user.name.charAt(0)
-                            )}
-                        </motion.button>
-                    </div>
-                </header>
+            <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
                 {/* activeView controls which page shows up here */}
-                <main className="flex-1 p-6 space-y-6 overflow-y-auto overflow-x-hidden">
-                    <AnimatePresence mode="wait">
+                <main className="flex-1 overflow-hidden">
+                    <div className="p-6 max-w-[1200px] mx-auto h-full overflow-y-auto space-y-6">
+                        <AnimatePresence mode="wait">
                         {activeView === "Active Jobs" ? (
 
                             <motion.div
-                                key="jobs-view"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                initial={{ opacity: 0, y: -30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 30 }}
+                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                             >
                                 <JobsDashboard
                                     jobs={jobs}
@@ -351,10 +331,10 @@ export default function Dashboard() {
 
                             <motion.div
                                 key="job-detail-view"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                initial={{ opacity: 0, y: -30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 30 }}
+                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                             >
                                 <JobDetailView
                                     job={jobs.find((j) => j._id === selectedJobId) as Job}
@@ -391,10 +371,10 @@ export default function Dashboard() {
 
                             <motion.div
                                 key="settings-view"
-                                initial={{ opacity: 0, x: 20 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                exit={{ opacity: 0, x: -20 }}
-                                transition={{ duration: 0.3, ease: "easeOut" }}
+                                initial={{ opacity: 0, y: -30 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 30 }}
+                                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                             >
                                 <SettingsView />
                             </motion.div>
@@ -413,23 +393,23 @@ export default function Dashboard() {
                                 />
 
 
-                                <div className="grid grid-cols-1 xl:grid-cols-5 gap-5 items-stretch">
+                                <div className="grid grid-cols-1 xl:grid-cols-5 gap-6 items-stretch">
 
-                                    <div className="xl:col-span-2 bg-[var(--card-bg)] rounded-lg shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 flex flex-col">
-                                        <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Upload Resume</h3>
+                                    <div className="xl:col-span-2 bg-white dark:bg-[#0a0a0a] border border-gray-200 dark:border-white/10 rounded-lg p-4 flex flex-col animate-fade-in stagger-2">
+                                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Upload Resume</h3>
 
                                         {jobs.length === 0 ? (
                                             /* Inline prompt when no jobs exist yet */
                                             <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
-                                                <div className="w-12 h-12 rounded-xl bg-[var(--accent-light)] flex items-center justify-center mb-4">
-                                                    <Sparkles className="w-6 h-6 text-[var(--accent)]" />
+                                                <div className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/20 flex items-center justify-center mb-4">
+                                                    <Sparkles className="w-5 h-5 text-gray-400" />
                                                 </div>
-                                                <p className="text-sm text-[var(--text-secondary)] mb-4 max-w-xs leading-relaxed">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-xs leading-relaxed">
                                                     Create a job posting first, then upload resumes to score candidates against it.
                                                 </p>
                                                 <button
                                                     onClick={() => setActiveView("Active Jobs")}
-                                                    className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+                                                    className="px-4 py-2 text-sm font-medium rounded-md bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
                                                 >
                                                     Create Your First Job →
                                                 </button>
@@ -441,10 +421,10 @@ export default function Dashboard() {
                                             <select
                                                 value={selectedJobRole}
                                                 onChange={(e) => setSelectedJobRole(e.target.value)}
-                                                className={`w-full px-4 py-2.5 rounded-lg border text-sm outline-none transition-all appearance-none cursor-pointer bg-[var(--body-bg)] ${selectedJobRole
-                                                    ? "border-[var(--accent)] text-[var(--text-primary)] ring-2 ring-[var(--accent)]/10"
-                                                    : "border-[var(--card-border)] text-[var(--text-secondary)]"
-                                                    } focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20`}
+                                                className={`w-full px-3 py-2 rounded-md border text-sm outline-none transition-colors appearance-none cursor-pointer bg-white dark:bg-[#0a0a0a] ${selectedJobRole
+                                                    ? "border-gray-300 dark:border-white/30 text-gray-900 dark:text-white"
+                                                    : "border-gray-200 dark:border-white/10 text-gray-500"
+                                                    } focus:border-gray-400 dark:focus:border-gray-500`}
                                             >
                                                 <option value="" disabled>Select a Job Role...</option>
                                                 {jobs.filter(j => j.status === "Active").map((job) => (
@@ -452,7 +432,7 @@ export default function Dashboard() {
                                                 ))}
                                             </select>
                                             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                                <svg className="w-4 h-4 text-[var(--text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                                             </div>
                                         </div>
 
@@ -461,28 +441,24 @@ export default function Dashboard() {
                                             onDrop={handleDrop}
                                             onDragOver={handleDragOver}
                                             onDragLeave={handleDragLeave}
-                                            className={`flex-1 flex flex-col items-center justify-center cursor-pointer rounded-xl border-2 border-dashed p-8 transition-all ${isDragOver
-                                                ? "border-[var(--accent)] bg-[var(--accent-light)]"
+                                            className={`flex-1 flex flex-col items-center justify-center cursor-pointer rounded-lg border border-dashed p-6 transition-colors ${isDragOver
+                                                ? "border-gray-400 bg-gray-50 dark:bg-[#111]"
                                                 : file
-                                                    ? "border-emerald-400 bg-[var(--success-light)]"
-                                                    : "border-[var(--card-border)] hover:border-[var(--accent)] hover:bg-[var(--accent-light)]/50"
+                                                    ? "border-gray-400 dark:border-gray-500 bg-gray-50 dark:bg-[#111]"
+                                                    : "border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5"
                                                 }`}
                                         >
                                             {file ? (
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <div className="w-12 h-12 rounded-xl bg-[var(--success-light)] flex items-center justify-center">
-                                                        <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-                                                    </div>
-                                                    <p className="text-sm font-semibold text-emerald-600">File Ready</p>
-                                                    <p className="text-xs text-[var(--text-secondary)]">{file.name}</p>
+                                                    <CheckCircle2 className="w-8 h-8 text-gray-900 dark:text-white mb-2" />
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">File Ready</p>
+                                                    <p className="text-xs text-gray-500 font-mono truncate max-w-xs">{file.name}</p>
                                                 </div>
                                             ) : (
                                                 <div className="flex flex-col items-center gap-2">
-                                                    <div className="w-12 h-12 rounded-xl bg-[var(--body-bg)] flex items-center justify-center">
-                                                        <Upload className="w-6 h-6 text-[var(--text-secondary)]" />
-                                                    </div>
-                                                    <p className="text-sm font-medium text-[var(--text-primary)]">Drop Resume PDF here</p>
-                                                    <p className="text-xs text-[var(--text-secondary)]">or click to browse</p>
+                                                    <Upload className="w-8 h-8 text-gray-400 mb-2" />
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">Drop Resume PDF here</p>
+                                                    <p className="text-xs text-gray-500">or click to browse</p>
                                                 </div>
                                             )}
                                             <input
@@ -498,9 +474,9 @@ export default function Dashboard() {
                                             <button
                                                 onClick={handleUpload}
                                                 disabled={uploading}
-                                                className={`mt-4 w-full py-2.5 rounded-lg text-sm font-semibold transition-colors ${uploading
-                                                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                                    : "bg-[var(--accent)] text-white hover:opacity-90"
+                                                className={`mt-4 w-full px-4 py-2 rounded-md text-sm font-medium transition-colors ${uploading
+                                                    ? "bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500 cursor-not-allowed"
+                                                    : "bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100"
                                                     }`}
                                             >
                                                 {uploading ? "Analyzing…" : `Analyze ${file.name}`}
@@ -533,17 +509,18 @@ export default function Dashboard() {
                             />
                         )}
                     </AnimatePresence>
+                    </div>
                 </main>
 
 
-                <footer className="border-t border-[var(--card-border)] bg-[var(--card-bg)] px-6 py-4">
-                    <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-                        <p>© 2026 <span className="font-semibold text-[var(--text-primary)]">Smart-Vet</span>. All rights reserved.</p>
+                <footer className="border-t border-gray-200 dark:border-white/10 bg-white dark:bg-black px-6 py-4 mt-auto">
+                    <div className="max-w-[1200px] mx-auto flex items-center justify-between text-xs text-gray-500">
+                        <p>© 2026 <span className="font-semibold text-gray-900 dark:text-white">Smart-Vet</span>. All rights reserved.</p>
                         <div className="flex items-center gap-4">
-                            <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Terms</a>
-                            <a href="#" className="hover:text-[var(--text-primary)] transition-colors">Support</a>
-                            <span className="text-[var(--text-secondary)]/50">v0.1.1</span>
+                            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Privacy</a>
+                            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Terms</a>
+                            <a href="#" className="hover:text-gray-900 dark:hover:text-gray-300 transition-colors">Support</a>
+                            <span className="text-gray-400 dark:text-gray-600">v0.1.1</span>
                         </div>
                     </div>
                 </footer>
@@ -623,12 +600,12 @@ export default function Dashboard() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 20, scale: 0.95 }}
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-3 bg-gray-900 text-white px-5 py-3 rounded-lg shadow-2xl shadow-black/20"
+                        className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-2 px-4 py-3 rounded-lg border border-red-300 dark:border-red-800 bg-white dark:bg-[#0a0a0a] shadow-lg"
                     >
-                        <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center shrink-0">
-                            <span className="text-xs font-bold text-white">!</span>
+                        <div className="w-4 h-4 rounded-full bg-red-500 flex items-center justify-center shrink-0">
+                            <span className="text-[10px] font-bold text-white">!</span>
                         </div>
-                        <p className="text-sm font-medium">{toast.message}</p>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">{toast.message}</p>
                     </motion.div>
                 )}
             </AnimatePresence>

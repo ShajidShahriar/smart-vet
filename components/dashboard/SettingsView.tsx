@@ -40,12 +40,10 @@ function Section({ index, icon: Icon, title, badge, children }: { index: number;
             layoutId={`settings-section-${index}`}
         >
             <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-[var(--accent-light)] flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-[var(--accent)]" />
-                </div>
-                <h2 className="text-base font-bold text-[var(--text-primary)] tracking-tight">{title}</h2>
+                <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <h2 className="text-base font-bold text-gray-900 dark:text-white tracking-tight">{title}</h2>
                 {badge && (
-                    <span className="ml-2 px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-[var(--card-border)] text-[var(--text-secondary)]">
+                    <span className="ml-2 px-2 py-0.5 rounded-md text-[10px] font-bold uppercase border border-gray-300 dark:border-white/20 text-gray-500 dark:text-gray-400 bg-transparent">
                         {badge}
                     </span>
                 )}
@@ -148,17 +146,17 @@ function ProfileContent() {
 
     if (!session) {
         return (
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] p-8 text-center">
-                <div className="w-16 h-16 bg-[var(--accent-light)] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <User className="w-8 h-8 text-[var(--accent)]" />
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-8 text-center">
+                <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <User className="w-8 h-8 text-gray-900 dark:text-white" />
                 </div>
-                <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Sign in to SmartVet</h3>
-                <p className="text-[var(--text-secondary)] text-sm mb-6 max-w-sm mx-auto">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Sign in to SmartVet</h3>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm mx-auto">
                     Create an account to save your preferences, track usage, and manage your profile across devices.
                 </p>
                 <button
                     onClick={() => signIn("google")}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-bold bg-[var(--text-primary)] text-[var(--body-bg)] hover:opacity-90 transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg text-sm font-bold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-all"
                 >
                     <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" /></svg>
                     Continue with Google
@@ -170,61 +168,61 @@ function ProfileContent() {
     return (
         <div className="space-y-4">
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
-                <div className="flex items-center gap-6 mb-6 pb-6 border-b border-[var(--card-border)]">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
+                <div className="flex items-center gap-6 mb-6 pb-6 border-b border-gray-200 dark:border-white/10">
                     <label
                         onDrop={handleAvatarDrop}
                         onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
                         onDragLeave={() => setIsDragOver(false)}
                         className={`w-20 h-20 rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer overflow-hidden transition-all shrink-0 ${isDragOver
-                            ? "border-[var(--accent)] bg-[var(--accent-light)]"
-                            : "border-[var(--card-border)] hover:border-[var(--accent)] hover:bg-[var(--accent-light)]/50"
+                            ? "border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800"
+                            : "border-gray-200 dark:border-white/10 hover:border-gray-400 dark:border-gray-500 hover:bg-gray-100 dark:bg-gray-800/50"
                             }`}
                     >
                         {avatarPreview ? (
                             <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                            <Upload className="w-5 h-5 text-[var(--text-secondary)]" />
+                            <Upload className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                         )}
                         <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                     </label>
                     <div>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">Profile Picture</p>
-                        <p className="text-xs text-[var(--text-secondary)] mt-0.5">Drag & drop or click. PNG, JPG up to 2MB.</p>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Profile Picture</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Drag & drop or click. PNG, JPG up to 2MB.</p>
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">Full Name</label>
-                        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-[var(--card-border)] bg-[var(--body-bg)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all" />
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Full Name</label>
+                        <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className="w-full px-4 py-2.5 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#111] text-sm text-gray-900 dark:text-white outline-none focus:border-gray-400 dark:border-gray-500 focus:ring-2 focus:ring-gray-300 dark:ring-gray-700 transition-all" />
                     </div>
                     <div>
-                        <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">Job Title</label>
-                        <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="w-full px-4 py-2.5 rounded-lg border border-[var(--card-border)] bg-[var(--body-bg)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all" />
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Job Title</label>
+                        <input type="text" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} className="w-full px-4 py-2.5 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#111] text-sm text-gray-900 dark:text-white outline-none focus:border-gray-400 dark:border-gray-500 focus:ring-2 focus:ring-gray-300 dark:ring-gray-700 transition-all" />
                     </div>
                     <div className="md:col-span-2">
-                        <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">Email Address</label>
-                        <input type="email" value={email} disabled className="w-full px-4 py-2.5 rounded-lg border border-[var(--card-border)] bg-[var(--body-bg)]/50 text-sm text-[var(--text-secondary)] outline-none cursor-not-allowed" />
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Email Address</label>
+                        <input type="email" value={email} disabled className="w-full px-4 py-2.5 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#111]/50 text-sm text-gray-500 dark:text-gray-400 outline-none cursor-not-allowed" />
                     </div>
                 </div>
                 <div className="mt-5 flex items-center justify-between">
-                    <button onClick={() => signOut()} className="text-xs font-semibold text-[var(--text-secondary)] hover:text-[var(--danger)] transition-colors inline-flex items-center gap-1.5">
+                    <button onClick={() => signOut()} className="text-xs font-semibold text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors inline-flex items-center gap-1.5">
                         <LogOut className="w-3.5 h-3.5" /> Sign Out
                     </button>
-                    <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity disabled:opacity-70">
+                    <button onClick={handleSave} disabled={saving} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity disabled:opacity-70">
                         {saving ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </div>
 
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--danger)]/30 shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex items-center justify-between gap-4">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-red-300 dark:border-red-900/30 p-5 flex items-center justify-between gap-4">
                 <div>
-                    <p className="text-sm font-semibold text-[var(--danger)]">Danger Zone</p>
-                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">Permanently delete your account. This cannot be undone.</p>
+                    <p className="text-sm font-semibold text-red-500">Danger Zone</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Permanently delete your account. This cannot be undone.</p>
                 </div>
-                <button disabled className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[var(--danger-light)] text-[var(--danger)] border border-[var(--danger)]/20 opacity-60 cursor-not-allowed shrink-0">
+                <button disabled className="inline-flex items-center gap-2 px-4 py-2.5 rounded-md text-sm font-semibold bg-red-600 text-white opacity-60 cursor-not-allowed shrink-0 border border-red-700">
                     <Trash2 className="w-4 h-4" /> Delete Account (Soon)
                 </button>
             </div>
@@ -240,44 +238,44 @@ function SubscriptionContent() {
 
     return (
         <div className="space-y-4">
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
                 <div className="flex items-center justify-between mb-5">
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Current Plan</h3>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[var(--accent-light)] text-[var(--accent)] border border-[var(--accent)]/20">Free Tier</span>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Current Plan</h3>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-transparent text-gray-900 dark:text-white border border-gray-300 dark:border-white/20">Free Tier</span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center mb-6">
-                    <div className="p-3 bg-[var(--body-bg)] rounded-lg">
-                        <p className="text-xl font-bold text-[var(--text-primary)]">10</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold mt-0.5">Monthly Credits</p>
+                    <div className="p-3 bg-gray-50 dark:bg-[#111] rounded-lg">
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">10</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold mt-0.5">Monthly Credits</p>
                     </div>
-                    <div className="p-3 bg-[var(--body-bg)] rounded-lg">
-                        <p className="text-xl font-bold text-[var(--text-primary)]">3</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold mt-0.5">Active Jobs</p>
+                    <div className="p-3 bg-gray-50 dark:bg-[#111] rounded-lg">
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">3</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold mt-0.5">Active Jobs</p>
                     </div>
-                    <div className="p-3 bg-[var(--body-bg)] rounded-lg">
-                        <p className="text-xl font-bold text-[var(--text-primary)]">1</p>
-                        <p className="text-[10px] text-[var(--text-secondary)] uppercase font-semibold mt-0.5">Team Member</p>
+                    <div className="p-3 bg-gray-50 dark:bg-[#111] rounded-lg">
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">1</p>
+                        <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold mt-0.5">Team Member</p>
                     </div>
                 </div>
 
 
                 <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-[var(--text-secondary)] text-xs font-medium">API Credits Used</span>
-                    <span className="font-bold text-sm text-[var(--text-primary)]">{creditsUsed}/{creditsTotal}</span>
+                    <span className="text-gray-500 dark:text-gray-400 text-xs font-medium">API Credits Used</span>
+                    <span className="font-bold text-sm text-gray-900 dark:text-white">{creditsUsed}/{creditsTotal}</span>
                 </div>
-                <div className="w-full bg-[var(--body-bg)] h-2.5 rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full transition-all duration-500 ${pct > 80 ? "bg-[var(--danger)]" : pct > 50 ? "bg-amber-500" : "bg-[var(--accent)]"}`} style={{ width: `${pct}%` }} />
+                <div className="w-full bg-gray-50 dark:bg-[#111] h-2.5 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full transition-all duration-500 bg-gray-900 dark:bg-white`} style={{ width: `${pct}%` }} />
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets monthly.</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets monthly.</p>
             </div>
 
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-5 flex items-center justify-between gap-4">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-5 flex items-center justify-between gap-4">
                 <div>
-                    <p className="text-sm font-semibold text-[var(--text-primary)]">Need more power?</p>
-                    <p className="text-xs text-[var(--text-secondary)] mt-0.5">Upgrade to Pro for unlimited credits, priority AI, and team collaboration.</p>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Need more power?</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Upgrade to Pro for unlimited credits, priority AI, and team collaboration.</p>
                 </div>
-                <button className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity shrink-0">Upgrade Plan</button>
+                <button className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0">Upgrade Plan</button>
             </div>
         </div>
     );
@@ -310,45 +308,45 @@ function ApiEngineContent() {
     return (
         <div className="space-y-4">
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Bring Your Own Key (BYOK)</h3>
-                <p className="text-xs text-[var(--text-secondary)] mb-4">Your key is stored securely and never shared.</p>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-1.5">Gemini API Key</label>
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-0.5">Bring Your Own Key (BYOK)</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Your key is stored securely and never shared.</p>
+                <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1.5">Gemini API Key</label>
                 <div className="relative">
                     <input
                         type={showKey ? "text" : "password"}
                         value={apiKey}
                         onChange={(e) => setApiKey(e.target.value)}
                         placeholder="AIzaSy..."
-                        className="w-full px-4 py-2.5 pr-12 rounded-lg border border-[var(--card-border)] bg-[var(--body-bg)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/60 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all font-mono"
+                        className="w-full px-4 py-2.5 pr-12 rounded-md border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#111] text-sm text-gray-900 dark:text-white placeholder:text-gray-500 dark:text-gray-400/60 outline-none focus:border-gray-400 dark:border-gray-500 focus:ring-2 focus:ring-gray-300 dark:ring-gray-700 transition-all font-mono"
                     />
-                    <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+                    <button onClick={() => setShowKey(!showKey)} className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:text-white transition-colors">
                         {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                 </div>
-                <p className="text-[11px] text-[var(--text-secondary)] mt-1.5">Get your key from <span className="text-[var(--accent)] font-medium">Google AI Studio</span></p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1.5">Get your key from <span className="text-gray-900 dark:text-white font-medium">Google AI Studio</span></p>
             </div>
 
             {/* grouped together because they both affect ai behavior */}
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6 space-y-6">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6 space-y-6">
 
                 <div>
                     <div className="flex items-center justify-between mb-2">
-                        <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wide">Grading Strictness</label>
-                        <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${strictness > 75 ? "bg-[var(--danger-light)] text-[var(--danger)]" : strictness > 50 ? "bg-amber-50 text-amber-600" : "bg-[var(--accent-light)] text-[var(--accent)]"}`}>
+                        <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Grading Strictness</label>
+                        <span className={`px-2 py-0.5 rounded-md text-xs font-bold bg-transparent border border-gray-300 dark:border-white/20 text-gray-900 dark:text-white`}>
                             {strictnessLabel}
                         </span>
                     </div>
-                    <input type="range" min={0} max={100} value={strictness} onChange={(e) => setStrictness(Number(e.target.value))} className="w-full h-2 rounded-full appearance-none cursor-pointer bg-[var(--body-bg)] accent-[var(--accent)]" />
-                    <div className="flex justify-between text-[10px] text-[var(--text-secondary)] mt-1 font-medium">
+                    <input type="range" min={0} max={100} value={strictness} onChange={(e) => setStrictness(Number(e.target.value))} className="w-full h-2 rounded-full appearance-none cursor-pointer bg-gray-50 dark:bg-[#111] accent-gray-900 dark:accent-white" />
+                    <div className="flex justify-between text-[10px] text-gray-500 dark:text-gray-400 mt-1 font-medium">
                         <span>Lenient</span><span>Balanced</span><span>Strict</span><span>Ruthless</span>
                     </div>
                 </div>
             </div>
 
             <div className="flex justify-end items-center gap-3">
-                {saved && <span className="text-xs font-semibold text-[var(--success)] animate-in fade-in slide-in-from-right-2">Settings Saved!</span>}
-                <button onClick={handleSave} className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity">Save Configuration</button>
+                {saved && <span className="text-xs font-semibold text-gray-900 dark:text-white animate-in fade-in slide-in-from-right-2">Settings Saved!</span>}
+                <button onClick={handleSave} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity">Save Configuration</button>
             </div>
         </div>
     );
@@ -380,33 +378,33 @@ function PreferencesContent() {
     return (
         <div className="space-y-4">
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
-                <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-0.5">Theme</h3>
-                <p className="text-xs text-[var(--text-secondary)] mb-4">Choose your preferred appearance.</p>
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-0.5">Theme</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Choose your preferred appearance.</p>
                 <div className="grid grid-cols-3 gap-3">
                     {themeOptions.map((opt) => (
                         <button
                             key={opt.id}
                             onClick={() => setTheme(opt.id)}
                             className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all cursor-pointer ${theme === opt.id
-                                ? "border-[var(--accent)] bg-[var(--accent-light)]"
-                                : "border-[var(--card-border)] hover:border-[var(--accent)]/50 bg-[var(--body-bg)]"
+                                ? "border-gray-400 dark:border-gray-500 bg-gray-100 dark:bg-gray-800"
+                                : "border-gray-200 dark:border-white/10 hover:border-gray-400 dark:border-gray-500/50 bg-gray-50 dark:bg-[#111]"
                                 }`}
                         >
-                            <opt.icon className={`w-5 h-5 ${theme === opt.id ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"}`} />
-                            <span className={`text-xs font-semibold ${theme === opt.id ? "text-[var(--accent)]" : "text-[var(--text-secondary)]"}`}>{opt.label}</span>
+                            <opt.icon className={`w-5 h-5 ${theme === opt.id ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"}`} />
+                            <span className={`text-xs font-semibold ${theme === opt.id ? "text-gray-900 dark:text-white" : "text-gray-500 dark:text-gray-400"}`}>{opt.label}</span>
                         </button>
                     ))}
                 </div>
             </div>
 
 
-            <div className="bg-[var(--card-bg)] rounded-lg border border-[var(--card-border)] shadow-[0_2px_12px_rgba(0,0,0,0.06)] p-6">
+            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
                 <div className="flex items-center gap-3 mb-0.5">
-                    <h3 className="text-sm font-semibold text-[var(--text-primary)]">Notifications</h3>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[var(--card-border)] text-[var(--text-secondary)]">COMING SOON</span>
+                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Notifications</h3>
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-transparent border border-gray-300 dark:border-white/20 text-gray-500 dark:text-gray-400">COMING SOON</span>
                 </div>
-                <p className="text-xs text-[var(--text-secondary)] mb-4">Control which events trigger notifications.</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Control which events trigger notifications.</p>
                 <div className="space-y-4 opacity-60 pointer-events-none">
                     <CheckboxRow checked={notifHighScore} onChange={setNotifHighScore} disabled={true} label="High score alert" desc="Email when a resume scores 90%+" />
                     <CheckboxRow checked={notifLowCredits} onChange={setNotifLowCredits} disabled={true} label="Low credits warning" desc="Notify when API credits drop below 20%" />
@@ -415,7 +413,7 @@ function PreferencesContent() {
             </div>
 
             <div className="flex justify-end">
-                <button disabled className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--card-border)] text-[var(--text-secondary)] cursor-not-allowed">Save Preferences</button>
+                <button disabled className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed">Save Preferences</button>
             </div>
         </div>
     );
@@ -426,13 +424,13 @@ function CheckboxRow({ checked, onChange, label, desc, disabled = false }: { che
     return (
         <label className={`flex items-start gap-3 ${disabled ? "cursor-not-allowed opacity-70" : "cursor-pointer group"}`} onClick={(e) => { if (disabled) e.preventDefault(); else onChange(!checked); }}>
             <div className="pt-0.5">
-                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-[var(--accent)] border-[var(--accent)]" : "border-[var(--card-border)]"} ${!disabled && !checked && "group-hover:border-[var(--accent)]/50"}`}>
+                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${checked ? "bg-gray-900 dark:bg-white border-gray-400 dark:border-gray-500" : "border-gray-200 dark:border-white/10"} ${!disabled && !checked && "group-hover:border-gray-400 dark:border-gray-500/50"}`}>
                     {checked && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
                 </div>
             </div>
             <div>
-                <p className="text-sm font-medium text-[var(--text-primary)]">{label}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{desc}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{desc}</p>
             </div>
         </label>
     );

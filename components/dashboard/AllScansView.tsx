@@ -35,11 +35,11 @@ export default function AllScansView({ scans, onBack, onSelectScan, onDeleteScan
         <motion.div
             key="all-scans-expanded"
             layoutId="scans-card"
-            initial={{ opacity: 0, scale: 0.9, y: -20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20 }}
-            transition={{ type: "spring", stiffness: 550, damping: 38, mass: 0.8 }}
-            className="bg-[var(--card-bg)] rounded-lg shadow-[0_4px_24px_rgba(0,0,0,0.08)] flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
+            initial={{ opacity: 0, y: -30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -30 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+            className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 flex flex-col min-h-[calc(100vh-8rem)] overflow-hidden"
         >
             <motion.div
                 className="p-6 flex-1 flex flex-col"
@@ -52,36 +52,36 @@ export default function AllScansView({ scans, onBack, onSelectScan, onDeleteScan
                     <div className="flex items-center gap-3">
                         <button
                             onClick={onBack}
-                            className="w-9 h-9 rounded-lg hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
+                            className="p-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 transition-colors"
                         >
-                            <ArrowLeft className="w-[18px] h-[18px] text-[var(--text-secondary)]" />
+                            <ArrowLeft className="w-4 h-4" />
                         </button>
                         <div>
-                            <h3 className="text-lg font-bold text-[var(--text-primary)]">All Scans</h3>
-                            <p className="text-xs text-[var(--text-secondary)]">{filteredScans.length} total results</p>
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">All Scans</h3>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{filteredScans.length} total results</p>
                         </div>
                     </div>
 
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+                    <div className="relative w-64">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                             type="text"
                             placeholder="Search scans..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-9 pr-4 py-2 bg-[var(--body-bg)] rounded-lg text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none focus:ring-2 focus:ring-[var(--accent)]/10 transition-shadow w-64"
+                            className="w-full pl-10 pr-4 py-2 text-sm rounded-md border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0a0a0a] text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-700 focus:border-transparent transition-all"
                         />
                     </div>
                 </div>
                 <div className="overflow-x-auto flex-1">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="border-b border-gray-100">
-                                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pl-4">File Name</th>
-                                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 px-2">Category</th>
-                                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 px-2">Date</th>
-                                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 px-2">Score</th>
-                                <th className="text-[11px] font-semibold text-[var(--text-secondary)] uppercase tracking-wider pb-3 pl-2">Status</th>
+                            <tr className="border-b border-gray-200 dark:border-white/10">
+                                <th className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider pb-3 pl-4">File Name</th>
+                                <th className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider pb-3 px-2">Category</th>
+                                <th className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider pb-3 px-2">Date</th>
+                                <th className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider pb-3 px-2">Score</th>
+                                <th className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider pb-3 pl-2">Status</th>
                                 <th className="pb-3 pr-4"></th>
                             </tr>
                         </thead>
@@ -90,41 +90,39 @@ export default function AllScansView({ scans, onBack, onSelectScan, onDeleteScan
                                 <motion.tr
                                     key={item._id}
                                     onClick={() => onSelectScan(item)}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.1 + (idx * 0.02) }}
-                                    className="border-b border-gray-100 last:border-0 hover:bg-[var(--body-bg)] transition-colors cursor-pointer group"
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.1 + (idx * 0.05), duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                                    className="border-b border-gray-100 dark:border-white/5 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer group"
                                 >
                                     <td className="py-3 pl-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-[var(--body-bg)] flex items-center justify-center shrink-0">
-                                                <FileText className="w-4 h-4 text-[var(--text-secondary)]" />
-                                            </div>
+                                            <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500 shrink-0" />
                                             <div className="min-w-0">
-                                                <p className="text-sm font-medium text-[var(--text-primary)] truncate max-w-[180px]">{item.candidateName || "Unknown"}</p>
-                                                <p className="text-xs text-[var(--text-secondary)] truncate max-w-[180px]">{item.filename}</p>
+                                                <p className="text-sm font-medium text-gray-900 dark:text-white truncate max-w-[180px]">{item.candidateName || "Unknown"}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[180px]">{item.filename}</p>
                                             </div>
                                         </div>
                                     </td>
                                     <td className="py-3 px-2">
-                                        <span className="inline-flex items-center px-2 py-1 rounded-md bg-[var(--body-bg)] text-xs font-medium text-[var(--text-secondary)] border border-[var(--card-border)] whitespace-nowrap">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-transparent text-xs font-medium text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-white/20 whitespace-nowrap">
                                             {item.category || "General"}
                                         </span>
                                     </td>
-                                    <td className="py-3 px-2 text-sm text-[var(--text-secondary)] whitespace-nowrap">
+                                    <td className="py-3 px-2 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap font-mono">
                                         {new Date(item.createdAt).toLocaleDateString()}
                                     </td>
-                                    <td className="py-3 px-2 text-sm font-semibold text-[var(--text-primary)]">{item.score}%</td>
+                                    <td className="py-3 px-2 text-sm font-semibold text-gray-900 dark:text-white font-mono">{item.score}%</td>
                                     <td className="py-3 pl-2">
                                         <div className="flex items-center gap-2">
-                                            <span className={`w-2 h-2 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-emerald-500" : item.status === "Pending" ? "bg-amber-400" : "bg-red-500"}`} />
-                                            <span className="text-sm font-medium text-[var(--text-primary)]">{item.status}</span>
+                                            <span className={`w-2 h-2 rounded-full ${item.status === "Accepted" || item.status === "Pass" ? "bg-gray-900 dark:bg-white" : item.status === "Pending" ? "bg-gray-400 dark:bg-gray-500" : "bg-gray-300 dark:bg-gray-600"}`} />
+                                            <span className="text-sm font-medium text-gray-900 dark:text-white">{item.status}</span>
                                         </div>
                                     </td>
                                     <td className="py-3 pr-4 text-right">
                                         <button
                                             onClick={(e) => onDeleteScan(e, item._id)}
-                                            className="p-1.5 rounded-lg text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500 hover:bg-red-50 transition-all"
+                                            className="p-1.5 rounded-md text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
                                             title="Delete Scan"
                                         >
                                             <Trash2 className="w-4 h-4" />

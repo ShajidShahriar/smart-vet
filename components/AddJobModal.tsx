@@ -92,7 +92,7 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                     {/* layoutId connects this to the ghost card in JobsDashboard */}
                     <motion.div
                         layoutId={layoutId}
-                        className="pointer-events-auto relative w-full max-w-lg bg-[var(--card-bg)] rounded-lg shadow-[0_24px_80px_rgba(0,0,0,0.18)] overflow-hidden"
+                        className="pointer-events-auto relative w-full max-w-lg bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 shadow-lg overflow-hidden"
                         initial={{ opacity: 0, scale: 0.9, y: -20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: -20 }}
@@ -106,21 +106,21 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                             transition={{ duration: 0.2 }}
                         >
 
-                            <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--card-border)]">
-                                <h2 className="text-lg font-bold text-[var(--text-primary)]">{initialData ? "Edit Job" : "Post New Job"}</h2>
+                            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-white/10">
+                                <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{initialData ? "Edit Job" : "Post New Job"}</h2>
                                 <button
                                     onClick={onClose}
-                                    className="w-8 h-8 rounded-lg hover:bg-[var(--body-bg)] flex items-center justify-center transition-colors"
+                                    className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center justify-center transition-colors"
                                 >
-                                    <X className="w-4 h-4 text-[var(--text-secondary)]" />
+                                    <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                 </button>
                             </div>
 
 
-                            <div className="px-6 py-5 space-y-5">
+                            <div className="px-5 py-5 space-y-5">
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                                    <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                                         Job Title
                                     </label>
                                     <input
@@ -128,21 +128,21 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                         value={title}
                                         onChange={(e) => setTitle(e.target.value)}
                                         placeholder="e.g. Senior React Developer"
-                                        className={`w-full px-4 py-2.5 rounded-lg border bg-[var(--body-bg)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/60 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all ${errors.title ? "border-red-500" : "border-[var(--card-border)]"
+                                        className={`w-full px-3 py-2 rounded-md border bg-white dark:bg-[#0a0a0a] text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-700 transition-colors ${errors.title ? "border-red-500" : "border-gray-200 dark:border-white/10"
                                             }`}
                                     />
-                                    {errors.title && <p className="mt-1 text-xs text-red-500">Job Title is required.</p>}
+                                    {errors.title && <p className="mt-1 text-[10px] text-red-500 font-medium">Job Title is required.</p>}
                                 </div>
 
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                                    <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                                         Department
                                     </label>
                                     <select
                                         value={department}
                                         onChange={(e) => setDepartment(e.target.value)}
-                                        className={`w-full px-4 py-2.5 rounded-lg border bg-[var(--body-bg)] text-sm text-[var(--text-primary)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all appearance-none cursor-pointer ${errors.department ? "border-red-500" : "border-[var(--card-border)]"
+                                        className={`w-full px-3 py-2 rounded-md border bg-white dark:bg-[#0a0a0a] text-sm text-gray-900 dark:text-white outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-700 transition-colors appearance-none cursor-pointer ${errors.department ? "border-red-500" : "border-gray-200 dark:border-white/10"
                                             }`}
                                     >
                                         <option value="" disabled>Select department</option>
@@ -150,12 +150,12 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                         <option value="design">Design</option>
                                         <option value="marketing">Marketing</option>
                                     </select>
-                                    {errors.department && <p className="mt-1 text-xs text-red-500">Department is required.</p>}
+                                    {errors.department && <p className="mt-1 text-[10px] text-red-500 font-medium">Department is required.</p>}
                                 </div>
 
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1.5">
+                                    <label className="block text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5">
                                         Job Description
                                     </label>
                                     <textarea
@@ -163,27 +163,27 @@ export default function AddJobModal({ isOpen, onClose, layoutId, initialData, on
                                         onChange={(e) => setDescription(e.target.value)}
                                         rows={10}
                                         placeholder="Paste the full LinkedIn job post or requirements here..."
-                                        className={`w-full px-4 py-3 rounded-lg border bg-[var(--body-bg)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]/60 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20 transition-all resize-none leading-relaxed ${errors.description ? "border-red-500" : "border-[var(--card-border)]"
+                                        className={`w-full px-3 py-2 rounded-md border bg-white dark:bg-[#0a0a0a] text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 outline-none focus:border-gray-400 dark:focus:border-gray-500 focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-700 transition-colors resize-none leading-relaxed ${errors.description ? "border-red-500" : "border-gray-200 dark:border-white/10"
                                             }`}
                                     />
-                                    <p className="mt-1.5 text-[11px] text-[var(--text-secondary)]">
+                                    <p className="mt-1.5 text-[10px] text-gray-500 dark:text-gray-400">
                                         This text is what the AI will use to grade resumes later.
                                     </p>
-                                    {errors.description && <p className="mt-1 text-xs text-red-500">Job Description is required.</p>}
+                                    {errors.description && <p className="mt-1 text-[10px] text-red-500 font-medium">Job Description is required.</p>}
                                 </div>
                             </div>
 
 
-                            <div className="flex items-center justify-end gap-3 px-6 py-4 bg-[var(--body-bg)] border-t border-[var(--card-border)]">
+                            <div className="flex items-center justify-end gap-3 px-5 py-4 border-t border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-[#111]/50">
                                 <button
                                     onClick={onClose}
-                                    className="px-5 py-2.5 rounded-lg text-sm font-semibold text-[var(--text-secondary)] hover:bg-[var(--card-border)] hover:text-[var(--text-primary)] transition-colors"
+                                    className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button
                                     onClick={handleSubmit}
-                                    className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[var(--accent)] text-white hover:opacity-90 transition-opacity"
+                                    className="px-4 py-2 rounded-md text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
                                 >
                                     {initialData ? "Update Role" : "Save Role"}
                                 </button>

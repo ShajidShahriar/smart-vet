@@ -16,10 +16,10 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
 
     // determine colors based on score
     const isPassing = scan.score >= 60;
-    const scoreColor = isPassing ? "text-emerald-500" : "text-rose-500";
-    const ringColor = isPassing ? "stroke-emerald-500" : "stroke-rose-500";
+    const scoreColor = isPassing ? "text-gray-900 dark:text-white" : "text-gray-400 dark:text-gray-500";
+    const ringColor = isPassing ? "stroke-gray-900 dark:stroke-white" : "stroke-gray-300 dark:stroke-gray-600";
     // used opacity for backgrounds so they look good in both modes
-    const bgClass = isPassing ? "bg-emerald-500/10" : "bg-rose-500/10";
+    const bgClass = isPassing ? "bg-gray-50 dark:bg-[#111]" : "bg-gray-50 dark:bg-[#111]";
     const statusText = isPassing ? "Strong Match" : "Needs Improvement";
 
     return (
@@ -32,7 +32,7 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-[var(--overlay-bg)] backdrop-blur-sm z-50 transition-opacity"
+                        className="fixed inset-0 bg-black/40 backdrop-blur-[2px] z-50 transition-opacity"
                     />
 
                     {/* modal */}
@@ -42,20 +42,20 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div className="bg-[var(--card-bg)] rounded-2xl shadow-2xl w-full max-w-md pointer-events-auto overflow-hidden flex flex-col max-h-[90vh] border border-[var(--card-border)]">
+                        <div className="bg-white dark:bg-[#0a0a0a] rounded-xl shadow-lg w-full max-w-md pointer-events-auto overflow-hidden flex flex-col max-h-[90vh] border border-gray-200 dark:border-white/10">
 
                             {/* Header with score breakdown */}
-                            <div className={`relative p-6 flex flex-col items-center justify-center border-b border-[var(--card-border)] ${bgClass}`}>
+                            <div className={`relative p-6 flex flex-col items-center justify-center border-b border-gray-200 dark:border-white/10 ${bgClass}`}>
                                 <button
                                     onClick={onClose}
-                                    className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                                    className="absolute top-4 right-4 p-1.5 rounded-md hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                                 >
-                                    <X className="w-5 h-5 text-[var(--text-secondary)]" />
+                                    <X className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                                 </button>
 
                                 <div className="relative w-24 h-24 flex items-center justify-center mb-3">
                                     <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-                                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-[var(--card-border)]" />
+                                        <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-gray-200 dark:text-white/10" />
                                         <circle
                                             cx="50"
                                             cy="50"
@@ -70,28 +70,28 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                                         />
                                     </svg>
                                     <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                        <span className={`text-3xl font-bold ${scoreColor}`}>{scan.score}</span>
+                                        <span className={`text-3xl font-bold font-mono ${scoreColor}`}>{scan.score}</span>
                                     </div>
                                 </div>
 
                                 <div className="text-center">
-                                    <h2 className="text-lg font-bold text-[var(--text-primary)]">{scan.candidateName || "Unknown Candidate"}</h2>
+                                    <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{scan.candidateName || "Unknown Candidate"}</h2>
                                     <div className="flex items-center justify-center gap-2 text-xs font-medium mt-1">
-                                        <span className={`px-2 py-0.5 rounded-full ${isPassing ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400" : "bg-rose-500/20 text-rose-600 dark:text-rose-400"}`}>
+                                        <span className={`px-2 py-0.5 rounded ${isPassing ? "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400"}`}>
                                             {statusText}
                                         </span>
-                                        <span className="text-[var(--text-secondary)]">•</span>
-                                        <span className="text-[var(--text-secondary)]">{scan.category}</span>
+                                        <span className="text-gray-500 dark:text-gray-400">•</span>
+                                        <span className="text-gray-500 dark:text-gray-400">{scan.category}</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Content */}
-                            <div className="p-6 overflow-y-auto">
+                            <div className="p-5 overflow-y-auto">
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-2">Analysis Summary</h3>
-                                        <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--body-bg)] p-4 rounded-lg border border-[var(--card-border)]">
+                                        <h3 className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Analysis Summary</h3>
+                                        <p className="text-sm text-gray-900 dark:text-white leading-relaxed bg-gray-50 dark:bg-[#111] p-4 rounded-lg border border-gray-200 dark:border-white/10">
                                             {scan.summary || "No summary available."}
                                         </p>
                                     </div>
@@ -110,25 +110,25 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
 
                                     {scan.breakdown && (
                                         <div>
-                                            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-secondary)] mb-3">Score Breakdown</h3>
+                                            <h3 className="text-[10px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Score Breakdown</h3>
                                             <div className="space-y-4">
                                                 {[
                                                     { label: "Skills & Relevance", data: scan.breakdown.skillsMatch },
                                                     { label: "Experience & Impact", data: scan.breakdown.experience },
                                                     { label: "Projects & Links", data: scan.breakdown.projectsLinks }
                                                 ].map((category, i) => category.data && (
-                                                    <div key={i} className="bg-[var(--body-bg)] p-4 rounded-lg border border-[var(--card-border)]">
+                                                    <div key={i} className="bg-gray-50 dark:bg-[#111] p-3 rounded-lg border border-gray-200 dark:border-white/10">
                                                         <div className="flex justify-between items-center mb-2">
-                                                            <span className="text-sm font-semibold text-[var(--text-primary)]">{category.label}</span>
-                                                            <span className="text-xs font-bold text-[var(--accent)]">{category.data.score} / {category.data.max}</span>
+                                                            <span className="text-xs font-medium text-gray-900 dark:text-white">{category.label}</span>
+                                                            <span className="text-[10px] font-bold text-gray-900 dark:text-white font-mono">{category.data.score} / {category.data.max}</span>
                                                         </div>
-                                                        <div className="w-full h-1.5 bg-[var(--card-border)] rounded-full mb-3 overflow-hidden">
+                                                        <div className="w-full h-1 bg-gray-200 dark:bg-white/10 rounded-full mb-3 overflow-hidden">
                                                             <div 
-                                                                className="h-full bg-[var(--accent)] rounded-full" 
+                                                                className="h-full bg-gray-900 dark:bg-white rounded-full" 
                                                                 style={{ width: `${(category.data.score / category.data.max) * 100}%` }}
                                                             />
                                                         </div>
-                                                        <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                                                        <p className="text-[10px] text-gray-500 dark:text-gray-400 leading-relaxed">
                                                             {category.data.comment}
                                                         </p>
                                                     </div>
@@ -137,13 +137,13 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                                         </div>
                                     )}
 
-                                    <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] pt-2 border-t border-[var(--card-border)]">
-                                        <FileText className="w-4 h-4" />
+                                    <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400 pt-3 border-t border-gray-200 dark:border-white/10">
+                                        <FileText className="w-3.5 h-3.5" />
                                         <a
                                             href={scan.fileUrl || "#"}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hover:text-[var(--accent)] hover:underline transition-colors cursor-pointer"
+                                            className="hover:text-gray-900 dark:hover:text-white hover:underline transition-colors cursor-pointer font-mono truncate"
                                         >
                                             Source file: {scan.filename}
                                         </a>
@@ -152,17 +152,17 @@ export default function ScanResultModal({ isOpen, onClose, scan, onUpdateStatus 
                             </div>
 
                             {/* Actions */}
-                            <div className="p-4 bg-[var(--body-bg)] border-t border-[var(--card-border)] grid grid-cols-2 gap-3">
+                            <div className="p-4 bg-gray-50 dark:bg-[#111] border-t border-gray-200 dark:border-white/10 grid grid-cols-2 gap-3">
                                 <button
                                     onClick={() => onUpdateStatus(scan._id, "Rejected")}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm bg-[var(--card-bg)] border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-all shadow-sm"
+                                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium text-sm bg-red-600 text-white hover:bg-red-700 transition-colors shadow-sm border border-red-700"
                                 >
                                     <XCircle className="w-4 h-4" />
                                     Reject
                                 </button>
                                 <button
                                     onClick={() => onUpdateStatus(scan._id, "Accepted")}
-                                    className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-semibold text-sm bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-500/20 transition-all shadow-md"
+                                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-md font-medium text-sm bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors shadow-sm"
                                 >
                                     <CheckCircle2 className="w-4 h-4" />
                                     Shortlist Candidate

@@ -1,84 +1,124 @@
 @import "tailwindcss";
 
-:root {
-  --sidebar-bg: #1a2332;
-  --sidebar-text: #8a94a6;
-  --sidebar-active: #4fd1c5;
-  --body-bg: #f4f7fe;
-  --card-bg: #ffffff;
-  --card-border: #e8ecf4;
-  --text-primary: #1a2332;
-  --text-secondary: #6b7a99;
-  --accent: #4fd1c5;
-  --accent-light: #e6faf8;
-  --danger: #ef4444;
-  --danger-light: #fef2f2;
-  --success: #22c55e;
-  --success-light: #f0fdf4;
-  /* New variable for overlays */
-  --overlay-bg: rgba(0, 0, 0, 0.5);
-  /* Unified dark overlay for both modes looks premium */
-}
-
-/* Higher specificity for dark mode overrides */
-/* Higher specificity for dark mode overrides */
-html.dark,
-:root[class~="dark"] {
-  --overlay-bg: rgba(0, 0, 0, 0.7) !important;
-  --sidebar-bg: #252526 !important;
-  /* VS Code Sidebar */
-  --sidebar-text: #a1a1aa !important;
-  /* Zinc-400 */
-  --sidebar-active: #4fd1c5 !important;
-  --body-bg: #181818 !important;
-  /* Dark foundation */
-  --card-bg: #1f1f1f !important;
-  /* Standard VS Code Main bg */
-  --card-border: #333333 !important;
-  /* Subtle dark border */
-  --text-primary: #e4e4e7 !important;
-  /* Zinc-200 (Silver-white) */
-  --text-secondary: #a1a1aa !important;
-  /* Zinc-400 */
-  --accent: #4fd1c5 !important;
-  --accent-light: rgba(79, 209, 197, 0.1) !important;
-  --danger: #ef4444 !important;
-  --danger-light: rgba(239, 68, 68, 0.1) !important;
-  --success: #22c55e !important;
-  --success-light: rgba(34, 197, 94, 0.1) !important;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--body-bg);
-  --color-foreground: var(--text-primary);
-  --font-sans: 'Inter', var(--font-geist-sans), system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+:root {
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+}
+
+.dark {
+  --background: #000000;
+  --foreground: #ededed;
+}
+
+* { box-sizing: border-box; }
+
 body {
-  background: var(--body-bg);
-  color: var(--text-primary);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* keeps scrollbars thin and out of the way */
-::-webkit-scrollbar {
-  width: 5px;
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
+.dark ::-webkit-scrollbar-thumb { background: #333333; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+
+@keyframes accordion-open {
+  from { max-height: 0; opacity: 0; }
+  to   { max-height: 500px; opacity: 1; }
+}
+.accordion-content-open { animation: accordion-open 0.3s ease-out forwards; overflow: hidden; }
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 112, 243, 0.4); }
+  50%      { box-shadow: 0 0 0 4px rgba(0, 112, 243, 0); }
+}
+.pulse-glow { animation: pulse-glow 2s infinite; }
+
+@keyframes progress-ring {
+  0%   { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: var(--progress-offset, 0); }
+}
+.progress-ring-circle {
+  animation: progress-ring 1s ease-out forwards;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
 }
 
-::-webkit-scrollbar-track {
-  background: transparent;
+/* Loader animation */
+.loader {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 1s linear infinite
+}
+.loader::before {
+  content: "";
+  box-sizing: border-box;
+  position: absolute;
+  inset: 0px;
+  border-radius: 50%;
+  border: 5px solid var(--foreground);
+  animation: prixClipFix 2s linear infinite ;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
+@keyframes rotate {
+  100%   {transform: rotate(360deg)}
 }
 
-html.dark ::-webkit-scrollbar-thumb,
-:root[class~="dark"] ::-webkit-scrollbar-thumb {
-  background: #404040;
+@keyframes prixClipFix {
+    0%   {clip-path:polygon(50% 50%,0 0,0 0,0 0,0 0,0 0)}
+    25%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 0,100% 0,100% 0)}
+    50%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,100% 100%,100% 100%)}
+    75%  {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 100%)}
+    100% {clip-path:polygon(50% 50%,0 0,100% 0,100% 100%,0 100%,0 0)}
+}
+
+/* Progress line animation */
+.progress-line {
+  height: 2px;
+  width: 100%;
+  background: var(--foreground);
+  opacity: 0.2;
+  position: relative;
+  overflow: hidden;
+}
+.progress-line::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 30%;
+  background: var(--foreground);
+  animation: progressLine 1.5s ease-in-out infinite;
+}
+@keyframes progressLine {
+  0% { left: -30%; }
+  100% { left: 100%; }
 }

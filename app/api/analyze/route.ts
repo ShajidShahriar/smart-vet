@@ -6,8 +6,10 @@ import { analyzeResume } from "@/lib/gemini";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
 import crypto from "crypto";
+import "@/lib/polyfills";
+import "@/lib/polyfills";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 
 // shape returned by Job.findOne().lean() — plain object, no Mongoose wrappers
 interface LeanJob {
