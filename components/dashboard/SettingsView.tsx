@@ -55,16 +55,27 @@ function Section({ index, icon: Icon, title, badge, children }: { index: number;
 
 
 export default function SettingsView() {
+    const [userData, setUserData] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/user/profile')
+            .then(res => res.json())
+            .then(data => {
+                if (data.user) setUserData(data.user);
+            })
+            .catch(err => console.error("Failed to fetch user data:", err));
+    }, []);
+
     return (
         <div className="space-y-8 max-w-3xl">
             <Section index={0} icon={User} title="Profile & Account">
                 <ProfileContent />
             </Section>
-            <Section index={1} icon={CreditCard} title="Subscription & Usage" badge="Coming Soon">
-                <SubscriptionContent />
+            <Section index={1} icon={CreditCard} title="Subscription & Usage">
+                <SubscriptionContent userData={userData} />
             </Section>
             <Section index={2} icon={Cpu} title="API & AI Engine">
-                <ApiEngineContent />
+                <ApiEngineContent userData={userData} />
             </Section>
             <Section index={3} icon={Palette} title="Preferences">
                 <PreferencesContent />
@@ -231,21 +242,60 @@ function ProfileContent() {
 }
 
 
-function SubscriptionContent() {
-    const creditsUsed = 7;
-    const creditsTotal = 10;
-    const pct = (creditsUsed / creditsTotal) * 100;
+function SubscriptionContent({ userData }: { userData: any }) {
+    const [isUpgrading, setIsUpgrading] = useState(false);
+
+    const creditsUsed = userData?.creditsUsed ?? 0;
+    const creditsTotal = userData?.creditsTotal ?? 10;
+    const isPremium = userData?.subscriptionTier === 'premium';
+    const pct = creditsTotal > 0 ? (creditsUsed / creditsTotal) * 100 : 0;
+
+    async function handleUpgrade() {
+        setIsUpgrading(true);
+        try {
+            const res = await fetch('/api/billing/checkout', { method: 'POST' });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                console.error("No checkout URL returned:", data);
+                setIsUpgrading(false);
+            }
+        } catch (e) {
+            console.error("Failed to start checkout:", e);
+            setIsUpgrading(false);
+        }
+    }
+
+    async function handleManageSubscription() {
+        setIsUpgrading(true);
+        try {
+            const res = await fetch('/api/billing/portal', { method: 'POST' });
+            const data = await res.json();
+            if (data.url) {
+                window.location.href = data.url;
+            } else {
+                console.error("No portal URL returned:", data);
+                setIsUpgrading(false);
+            }
+        } catch (e) {
+            console.error("Failed to start portal:", e);
+            setIsUpgrading(false);
+        }
+    }
 
     return (
         <div className="space-y-4">
             <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-6">
                 <div className="flex items-center justify-between mb-5">
                     <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Current Plan</h3>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-transparent text-gray-900 dark:text-white border border-gray-300 dark:border-white/20">Free Tier</span>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-transparent text-gray-900 dark:text-white border border-gray-300 dark:border-white/20">
+                        {isPremium ? "Pro Tier" : "Free Tier"}
+                    </span>
                 </div>
                 <div className="grid grid-cols-3 gap-3 text-center mb-6">
                     <div className="p-3 bg-gray-50 dark:bg-[#111] rounded-lg">
-                        <p className="text-xl font-bold text-gray-900 dark:text-white">10</p>
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">{creditsTotal === 100 ? "100" : creditsTotal}</p>
                         <p className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold mt-0.5">Monthly Credits</p>
                     </div>
                     <div className="p-3 bg-gray-50 dark:bg-[#111] rounded-lg">
@@ -266,23 +316,37 @@ function SubscriptionContent() {
                 <div className="w-full bg-gray-50 dark:bg-[#111] h-2.5 rounded-full overflow-hidden">
                     <div className={`h-full rounded-full transition-all duration-500 bg-gray-900 dark:bg-white`} style={{ width: `${pct}%` }} />
                 </div>
-                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1.5">{creditsTotal - creditsUsed} credits remaining. Resets monthly.</p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 mt-1.5">{Math.max(0, creditsTotal - creditsUsed)} credits remaining. Resets monthly.</p>
             </div>
 
 
-            <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-5 flex items-center justify-between gap-4">
-                <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Need more power?</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Upgrade to Pro for unlimited credits, priority AI, and team collaboration.</p>
+            {isPremium ? (
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-5 flex items-center justify-between gap-4">
+                    <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Manage Subscription</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Update payment method or cancel your Pro subscription.</p>
+                    </div>
+                    <button onClick={handleManageSubscription} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70">
+                        {isUpgrading ? "Redirecting..." : "Manage Subscription"}
+                    </button>
                 </div>
-                <button className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0">Upgrade Plan</button>
-            </div>
+            ) : (
+                <div className="bg-white dark:bg-[#0a0a0a] rounded-lg border border-gray-200 dark:border-white/10 p-5 flex items-center justify-between gap-4">
+                    <div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white">Need more power?</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Upgrade to Pro for unlimited credits, priority AI, and team collaboration.</p>
+                    </div>
+                    <button onClick={handleUpgrade} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70">
+                        {isUpgrading ? "Redirecting..." : "Upgrade Plan"}
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
 
 
-function ApiEngineContent() {
+function ApiEngineContent({ userData }: { userData: any }) {
     const [apiKey, setApiKey] = useState("");
     const [showKey, setShowKey] = useState(false);
     const [strictness, setStrictness] = useState(50);

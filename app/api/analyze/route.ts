@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Job from "@/lib/models/Job";
 import Scan from "@/lib/models/Scan";
+import User from "@/lib/models/User";
 import { analyzeResume } from "@/lib/gemini";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
@@ -30,6 +31,27 @@ export async function POST(req: Request) {
     }
 
     await dbConnect();
+
+    const user = await User.findById(session.user.id);
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Monthly reset check
+    const now = new Date();
+    const msSinceReset = now.getTime() - new Date(user.creditsResetAt).getTime();
+    if (msSinceReset > 30 * 24 * 60 * 60 * 1000) {
+      user.creditsUsed = 0;
+      user.creditsResetAt = now;
+      await user.save();
+    }
+
+    if (user.creditsUsed >= user.creditsTotal) {
+      return NextResponse.json(
+        { error: 'Credit limit reached', tier: user.subscriptionTier, upgradeUrl: '/?tab=billing' },
+        { status: 402 }
+      );
+    }
 
     // handle form data for file upload
     const formData = await req.formData();
@@ -86,7 +108,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "job not found or access denied" }, { status: 404 });
     }
 
-    // retrieving configuration from headers (BYOK support)
     const apiKey = req.headers.get("x-gemini-api-key") || undefined;
     const strictness = parseInt(req.headers.get("x-gemini-strictness") || "50");
 
@@ -134,6 +155,10 @@ export async function POST(req: Request) {
       category: jobTitle,
       promptHash, // Save the hash so future uploads hit the cache
     });
+
+    // After successful scan (cache hit OR fresh Gemini call):
+    user.creditsUsed += 1;
+    await user.save();
 
     return NextResponse.json({
       success: true,

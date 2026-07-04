@@ -22,37 +22,16 @@ export default function Home() {
         <div className="relative flex flex-col items-center gap-6 z-10">
           {/* Logo mark */}
           <div
-            className="w-16 h-16 rounded-2xl bg-[var(--accent)] flex items-center justify-center shadow-lg"
+            className="flex items-center justify-center"
             style={{ animation: "bootFloat 2s ease-in-out infinite" }}
           >
-            <svg
-              width="32"
-              height="32"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44A2.5 2.5 0 0 1 2 17.5v-.5a2 2 0 0 1 2-2h1a2 2 0 0 0 2-2V9.5A2.5 2.5 0 0 1 9.5 2Z" />
-              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44A2.5 2.5 0 0 0 22 17.5v-.5a2 2 0 0 0-2-2h-1a2 2 0 0 1-2-2V9.5A2.5 2.5 0 0 0 14.5 2Z" />
-            </svg>
+            <img src="/smartvet-dark.png" alt="Smart-Vet" className="h-14 dark:hidden" />
+            <img src="/smartvet-light.png" alt="Smart-Vet" className="h-14 hidden dark:block" />
           </div>
 
-          {/* Scanning bars */}
-          <div className="flex items-end gap-[3px] h-5">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <div
-                key={i}
-                className="w-[3px] rounded-full bg-[var(--accent)]"
-                style={{
-                  animation: "bootBar 1.2s ease-in-out infinite",
-                  animationDelay: `${i * 0.15}s`,
-                  height: "6px",
-                }}
-              />
-            ))}
+          {/* Loading indicator */}
+          <div className="flex items-center justify-center mt-2">
+            <div className="loader h-8 transform scale-50 origin-top"></div>
           </div>
         </div>
 

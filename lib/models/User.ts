@@ -22,6 +22,13 @@ const UserSchema = new Schema({
     // usage tracking
     creditsUsed: { type: Number, default: 0 },
     creditsTotal: { type: Number, default: 10 },
+    
+    // Stripe references and subscription tier
+    subscriptionTier: { type: String, enum: ['free', 'premium'], default: 'free' },
+    stripeCustomerId: { type: String, default: null },
+    stripeSubscriptionId: { type: String, default: null },
+    stripeSubscriptionStatus: { type: String, default: null },
+    creditsResetAt: { type: Date, default: Date.now }, // for monthly credit refresh
 }, {
     timestamps: true,
 });

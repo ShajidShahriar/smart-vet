@@ -56,6 +56,7 @@ export default function Dashboard() {
     const [showScanModal, setShowScanModal] = useState(false);
     const [selectedScan, setSelectedScan] = useState<Scan | null>(null);
     const [showProfileModal, setShowProfileModal] = useState(false);
+    const [userData, setUserData] = useState<any>(null);
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
 
@@ -81,18 +82,31 @@ export default function Dashboard() {
         }
     }, []);
 
+    const fetchUserProfile = useCallback(async () => {
+        try {
+            const res = await fetch("/api/user/profile");
+            if (res.ok) {
+                const data = await res.json();
+                if (data.user) setUserData(data.user);
+            }
+        } catch (err) {
+            console.error("failed to fetch user profile:", err);
+        }
+    }, []);
+
     // load data on mount with animation delay
     useEffect(() => {
         const loadData = async () => {
             await Promise.all([
                 fetchJobs(),
                 fetchScans(),
+                fetchUserProfile(),
                 new Promise((resolve) => setTimeout(resolve, 400)) // brief animation buffer
             ]);
             setIsLoading(false);
         };
         loadData();
-    }, [fetchJobs, fetchScans]);
+    }, [fetchJobs, fetchScans, fetchUserProfile]);
 
     const showToast = useCallback((message: string) => {
         setToast({ message, visible: true });
@@ -181,6 +195,7 @@ export default function Dashboard() {
                 setShowScanModal(true);
                 fetchScans(); // refresh the list to show the new scan
                 fetchJobs(); // refresh job cards for candidate count
+                fetchUserProfile(); // refresh user profile to update credits
                 setFile(null); // clear file input
             } else {
                 showToast("Error: " + result.error);
@@ -245,14 +260,18 @@ export default function Dashboard() {
         const total = scans.length;
         const shortlisted = scans.filter(s => s.status === "Pass" || s.status === "Accepted").length;
         const rejected = scans.filter(s => s.status === "Fail" || s.status === "Rejected").length;
+        
+        const creditsTotal = userData?.creditsTotal ?? 10;
+        const creditsUsed = userData?.creditsUsed ?? 0;
+        const creditsRemaining = userData ? Math.max(0, creditsTotal - creditsUsed) : 0;
 
         return {
             totalScans: { value: total.toLocaleString(), change: "", up: true },
             shortlisted: { value: shortlisted.toLocaleString(), change: "", up: true },
             rejected: { value: rejected.toLocaleString(), change: "", up: false },
-            credits: { value: "—", change: "Coming Soon", up: true },
+            credits: { value: userData ? creditsRemaining.toString() : "—", change: userData?.subscriptionTier === 'premium' ? "Pro Plan" : "Free Plan", up: true },
         };
-    }, [scans]);
+    }, [scans, userData]);
 
     return (
         <div className="flex flex-col h-screen bg-white dark:bg-black text-gray-900 dark:text-gray-100">
