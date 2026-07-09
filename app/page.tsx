@@ -30,8 +30,8 @@ export default function Home() {
           </div>
 
           {/* Loading indicator */}
-          <div className="flex items-center justify-center mt-2">
-            <div className="loader h-8 transform scale-50 origin-top"></div>
+          <div className="flex items-center justify-center mt-2 scale-50">
+            <div className="loader"></div>
           </div>
         </div>
 

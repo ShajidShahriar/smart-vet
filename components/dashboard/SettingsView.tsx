@@ -326,7 +326,7 @@ function SubscriptionContent({ userData }: { userData: any }) {
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">Manage Subscription</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Update payment method or cancel your Pro subscription.</p>
                     </div>
-                    <button onClick={handleManageSubscription} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70">
+                    <button onClick={handleManageSubscription} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70 w-[200px] flex justify-center items-center">
                         {isUpgrading ? "Redirecting..." : "Manage Subscription"}
                     </button>
                 </div>
@@ -336,7 +336,7 @@ function SubscriptionContent({ userData }: { userData: any }) {
                         <p className="text-sm font-semibold text-gray-900 dark:text-white">Need more power?</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Upgrade to Pro for unlimited credits, priority AI, and team collaboration.</p>
                     </div>
-                    <button onClick={handleUpgrade} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70">
+                    <button onClick={handleUpgrade} disabled={isUpgrading} className="px-5 py-2.5 rounded-md text-sm font-semibold bg-gray-900 dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-100 transition-opacity shrink-0 disabled:opacity-70 w-[200px] flex justify-center items-center">
                         {isUpgrading ? "Redirecting..." : "Upgrade Plan"}
                     </button>
                 </div>
