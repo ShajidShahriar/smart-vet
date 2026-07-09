@@ -4,9 +4,9 @@ import dbConnect from '@/lib/mongodb';
 import User from '@/lib/models/User';
 import ProcessedWebhookEvent from '@/lib/models/ProcessedWebhookEvent';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-
 export async function POST(req: Request) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
   const rawBody = await req.text(); // raw string, NOT req.json() — signature needs the exact bytes
   const signature = req.headers.get('stripe-signature')!;
 
