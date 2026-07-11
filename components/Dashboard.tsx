@@ -25,6 +25,7 @@ import AllScansView from "./dashboard/AllScansView";
 import SettingsView from "./dashboard/SettingsView";
 import ProfileModal from "./dashboard/ProfileModal";
 import ScanningOverlay from "./ScanningOverlay";
+import FirstTimeGuideModal from "./FirstTimeGuideModal";
 import { Job, Scan } from "../types";
 
 
@@ -59,10 +60,19 @@ export default function Dashboard() {
     const [userData, setUserData] = useState<any>(null);
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const [showGuideModal, setShowGuideModal] = useState(false);
 
     useEffect(() => {
         setMounted(true);
+        if (!localStorage.getItem("smartvet_has_seen_guide")) {
+            setShowGuideModal(true);
+        }
     }, []);
+
+    const closeGuideModal = () => {
+        setShowGuideModal(false);
+        localStorage.setItem("smartvet_has_seen_guide", "true");
+    };
 
     const fetchJobs = useCallback(async () => {
         try {
@@ -610,6 +620,11 @@ export default function Dashboard() {
                     />
                 )}
             </AnimatePresence>
+
+            <FirstTimeGuideModal 
+                isOpen={showGuideModal}
+                onClose={closeGuideModal}
+            />
 
             {/* shows up when someone tries uploading without picking a role first */}
             <AnimatePresence>

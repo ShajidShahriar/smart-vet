@@ -251,6 +251,7 @@ function SubscriptionContent({ userData }: { userData: any }) {
     const pct = creditsTotal > 0 ? (creditsUsed / creditsTotal) * 100 : 0;
 
     async function handleUpgrade() {
+        alert("Please note: This is a sandbox environment. Use the demo credit card number 4242 4242 4242 4242 for testing.");
         setIsUpgrading(true);
         try {
             const res = await fetch('/api/billing/checkout', { method: 'POST' });
@@ -268,6 +269,7 @@ function SubscriptionContent({ userData }: { userData: any }) {
     }
 
     async function handleManageSubscription() {
+        alert("Please note: This is a sandbox environment. Use the demo credit card number 4242 4242 4242 4242 for testing.");
         setIsUpgrading(true);
         try {
             const res = await fetch('/api/billing/portal', { method: 'POST' });
